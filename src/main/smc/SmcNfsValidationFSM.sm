@@ -1,0 +1,62 @@
+%package ru.mephi.bakinaa.lab1.validation.smc
+
+%class SmcNfsValidationFSMContext
+%fsmclass SmcNfsValidationFSM
+%fsmfile SmcNfsValidationFSM
+
+//%access public
+%start ValidatorMap::ProcessingHeader
+
+%map ValidatorMap %%
+    ProcessingHeader {
+        nextChar(c : Character) [c == SmcNfsValidationFSMContext.HEADER.charAt(ctxt.index) && ctxt.index == SmcNfsValidationFSMContext.HEADER.length() - 1] ProcessingServerName {
+            incIndex();
+            incNamesCnt();
+        }
+        nextChar(c : Character) [c == SmcNfsValidationFSMContext.HEADER.charAt(ctxt.index)] ProcessingHeader {
+            incIndex();
+        }
+        nextChar(c : Character) Invalid {}
+    }
+
+    ProcessingServerName {
+        nextChar(c : Character) [ ctxt.checkLen() ] Invalid {}
+        nextChar(c : Character) [ SmcNfsValidationFSMContext.isLetter(c) ] ProcessingServerName {
+            pushCharToName(c);
+            incLen();
+        }
+        nextChar(c : Character) [ ctxt.isNameEmpty() ] Invalid {}
+        nextChar(c : Character) [ SmcNfsValidationFSMContext.isSeparator(c) ] ProcessingSeparator { incLen(); }
+        nextChar(c : Character) Invalid { }
+    }
+
+    ProcessingSeparator {
+        nextChar(c : Character) [ ctxt.checkLen() ] Invalid {}
+        nextChar(c : Character) [ SmcNfsValidationFSMContext.isLetter(c) ] ProcessingSubdirName {
+            incLen();
+            incNamesCnt();
+        }
+        nextChar(c : Character) Invalid { }
+    }
+
+    ProcessingSubdirName {
+        nextChar(c : Character) [ ctxt.checkLen() ] Invalid {}
+        nextChar(c : Character) [ SmcNfsValidationFSMContext.isSeparator(c) ] ProcessingSeparator { incLen(); }
+        nextChar(c : Character) [ SmcNfsValidationFSMContext.isLetter(c) ] ProcessingSubdirName { incLen(); }
+        nextChar(c : Character) Invalid {}
+        end Valid {}
+    }
+
+    Default {
+        end Invalid {}
+    }
+
+    Valid {
+        end Valid {}
+        nextChar(c : Character) Valid {}
+    }
+    Invalid {
+        end Invalid {}
+        nextChar(c : Character) Invalid {}
+    }
+%%
