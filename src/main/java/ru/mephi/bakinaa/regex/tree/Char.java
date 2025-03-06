@@ -9,5 +9,5 @@ public class Char extends TreeNode {
 
 
     @Override
-    protected void calculatePos() {}
+    protected void calculateOwnPos() {}
 }

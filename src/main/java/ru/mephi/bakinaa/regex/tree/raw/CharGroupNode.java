@@ -1,5 +1,7 @@
 package ru.mephi.bakinaa.regex.tree.raw;
 
+import ru.mephi.bakinaa.regex.tree.TreeNode;
+
 public class CharGroupNode extends RawNode {
     public final String groupText;
 
@@ -8,10 +10,11 @@ public class CharGroupNode extends RawNode {
     }
 
     @Override
-    protected void calculatePos() {  }
+    protected void calculateOwnPos() {  }
 
     @Override
-    public void transform(TreeTransforamtionContext context) {
+    public TreeNode transform(TreeTransforamtionContext context) {
         // TODO
+        throw new UnsupportedOperationException("Not impimented yet");
     }
 }

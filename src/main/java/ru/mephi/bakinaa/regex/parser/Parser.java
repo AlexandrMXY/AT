@@ -19,9 +19,10 @@ package ru.mephi.bakinaa.regex.parser;
 
 //#line 2 "..\src\main\yacc\Parser.y"
 import ru.mephi.bakinaa.regex.tree.*;
+import ru.mephi.bakinaa.regex.tree.raw.*;
 import ru.mephi.bakinaa.regex.parser.*;
-
-//#line 21 "Parser.java"
+import ru.mephi.bakinaa.regex.chars.*;
+//#line 22 "Parser.java"
 
 
 
@@ -160,43 +161,42 @@ final ParserVal dup_yyval(ParserVal val)
 }
 //#### end semantic value section ####
 public final static short CHAR=257;
-public final static short OPEN_BR=258;
-public final static short CLOSE_BR=259;
-public final static short STAR=260;
-public final static short OR=261;
-public final static short CONCAT=262;
+public final static short CHAR_GROUP=258;
+public final static short OPEN_BR=259;
+public final static short CLOSE_BR=260;
+public final static short STAR=261;
+public final static short OR=262;
+public final static short CONCAT=263;
 public final static short YYERRCODE=256;
 final static short yylhs[] = {                           -1,
     0,    0,    0,    0,    0,    0,
 };
 final static short yylen[] = {                            2,
-    1,    3,    3,    2,    2,    3,
+    1,    1,    3,    3,    2,    3,
 };
 final static short yydefred[] = {                         0,
-    1,    0,    0,    0,    5,    0,    0,    0,    6,    0,
+    1,    2,    0,    0,    0,    5,    0,    0,    6,    0,
     0,
 };
-final static short yydgoto[] = {                          8,
+final static short yydgoto[] = {                          4,
 };
-final static short yysindex[] = {                      -250,
-    0, -250, -239, -245,    0, -250, -250, -239,    0, -233,
- -227,
+final static short yysindex[] = {                      -247,
+    0,    0, -247, -248, -254,    0, -247, -247,    0, -248,
+ -248,
 };
 final static short yyrindex[] = {                         0,
-    0,    0,    0,    0,    0,    0,    0,    2,    0,    5,
-    1,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    1,
+    2,
 };
-final static short yygindex[] = {                         4,
+final static short yygindex[] = {                        -3,
 };
-final static int YYTABLESIZE=266;
+final static int YYTABLESIZE=262;
 static short yytable[];
 static { yytable();}
 static void yytable(){
-yytable = new short[]{                          0,
-    3,    4,    0,    3,    2,    4,    1,    2,    0,   10,
-   11,    1,    2,    9,    5,    6,    7,    1,    2,    0,
-    5,    6,    7,    1,    2,    0,    5,    0,    7,    1,
-    2,    0,    5,    0,    0,    0,    0,    0,    0,    0,
+yytable = new short[]{                          5,
+    4,    3,    0,   10,   11,    9,    6,    7,    8,    1,
+    2,    3,    6,    7,    8,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
@@ -218,18 +218,18 @@ yytable = new short[]{                          0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
     0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
-    0,    0,    0,    0,    0,    0,    0,    0,    0,    3,
-    4,    3,    3,    2,    0,    2,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
+    4,    3,
 };
 }
 static short yycheck[];
 static { yycheck(); }
 static void yycheck() {
-yycheck = new short[] {                         -1,
-    0,    0,   -1,    0,    0,    2,  257,  258,   -1,    6,
-    7,  257,  258,  259,  260,  261,  262,  257,  258,   -1,
-  260,  261,  262,  257,  258,   -1,  260,   -1,  262,  257,
-  258,   -1,  260,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+yycheck = new short[] {                          3,
+    0,    0,   -1,    7,    8,  260,  261,  262,  263,  257,
+  258,  259,  261,  262,  263,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
@@ -251,12 +251,14 @@ yycheck = new short[] {                         -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
-   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,  259,
-  259,  261,  262,  259,   -1,  261,
+   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
+  260,  260,
 };
 }
-final static short YYFINAL=3;
-final static short YYMAXTOKEN=262;
+final static short YYFINAL=4;
+final static short YYMAXTOKEN=263;
 final static String yyname[] = {
 "end-of-file",null,null,null,null,null,null,null,null,null,null,null,null,null,
 null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
@@ -274,21 +276,21 @@ null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
 null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
 null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
 null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,
-null,null,null,"CHAR","OPEN_BR","CLOSE_BR","STAR","OR","CONCAT",
+null,null,null,"CHAR","CHAR_GROUP","OPEN_BR","CLOSE_BR","STAR","OR","CONCAT",
 };
 final static String yyrule[] = {
 "$accept : exp",
 "exp : CHAR",
-"exp : exp OR exp",
+"exp : CHAR_GROUP",
 "exp : exp CONCAT exp",
-"exp : exp exp",
+"exp : exp OR exp",
 "exp : exp STAR",
 "exp : OPEN_BR exp CLOSE_BR",
 };
 
-//#line 25 "..\src\main\yacc\Parser.y"
+//#line 27 "..\src\main\yacc\Parser.y"
 public Lexer lexer;
-public int grIndex = 0;
+public SymbolsTable sTable;
 
 void yyerror(String s) {
     throw new ParsingException(s);
@@ -320,12 +322,14 @@ int yylex() {
             } break;
             case Token.Type.CHAR: {
                 tokId = CHAR;
-                // TODO
-                yylval = new ParserVal(grIndex++);
+                sTable.registerGroup(new CharGroup(tok.data().charAt(0)));
+                yylval = new ParserVal(tok.data());
             } break;
             case Token.Type.CHAR_GROUP: {
-                tokId = CHAR;
-                yylval = new ParserVal(grIndex++);
+                tokId = CHAR_GROUP;
+                // TODO
+                // sTable.registerGroup(...);
+                yylval = new ParserVal(tok.data());
             } break;
         }
         return tokId;
@@ -339,7 +343,7 @@ int yylex() {
 public ParserVal yyval() {
     return yyval;
 }
-//#line 270 "Parser.java"
+//#line 274 "Parser.java"
 //###############################################################
 // method: yylexdebug : check lexer state
 //###############################################################
@@ -494,30 +498,30 @@ boolean doaction;
       {
 //########## USER-SUPPLIED ACTIONS ##########
 case 1:
-//#line 16 "..\src\main\yacc\Parser.y"
-{ yyval = new ParserVal(new Char(val_peek(0).ival)); }
+//#line 17 "..\src\main\yacc\Parser.y"
+{ yyval = new ParserVal(new RawChar(val_peek(0).sval)); }
 break;
 case 2:
-//#line 17 "..\src\main\yacc\Parser.y"
-{ yyval = new ParserVal(new Or((TreeNode)val_peek(2).obj, (TreeNode)val_peek(0).obj)); }
+//#line 18 "..\src\main\yacc\Parser.y"
+{ yyval = new ParserVal(new CharGroupNode(val_peek(0).sval)); }
 break;
 case 3:
-//#line 18 "..\src\main\yacc\Parser.y"
+//#line 19 "..\src\main\yacc\Parser.y"
 { yyval = new ParserVal(new Concat((TreeNode)val_peek(2).obj, (TreeNode)val_peek(0).obj)); }
 break;
 case 4:
-//#line 19 "..\src\main\yacc\Parser.y"
-{ yyval = new ParserVal(new Concat((TreeNode)val_peek(1).obj, (TreeNode)val_peek(0).obj)); }
+//#line 21 "..\src\main\yacc\Parser.y"
+{ yyval = new ParserVal(new Or((TreeNode)val_peek(2).obj, (TreeNode)val_peek(0).obj)); }
 break;
 case 5:
-//#line 20 "..\src\main\yacc\Parser.y"
+//#line 22 "..\src\main\yacc\Parser.y"
 { yyval = new ParserVal(new Star((TreeNode)val_peek(1).obj)); }
 break;
 case 6:
-//#line 21 "..\src\main\yacc\Parser.y"
+//#line 23 "..\src\main\yacc\Parser.y"
 { yyval = val_peek(1); }
 break;
-//#line 443 "Parser.java"
+//#line 447 "Parser.java"
 //########## END OF USER-SUPPLIED ACTIONS ##########
     }//switch
     //#### Now let's reduce... ####

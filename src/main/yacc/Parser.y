@@ -2,29 +2,30 @@
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.*;
 import ru.mephi.bakinaa.regex.parser.*;
-
+import ru.mephi.bakinaa.regex.chars.*;
 %}
 
-%token CHAR
+%token CHAR CHAR_GROUP
 %token OPEN_BR CLOSE_BR STAR OR CONCAT
 
-%left OR
-%left CONCAT
-%right STAR
+//%left OR
+//%left CONCAT
+//%right STAR
 
 %%
 
-exp: CHAR { $$ = new ParserVal(new Char($1.ival)); }
+exp: CHAR { $$ = new ParserVal(new RawChar($1.sval)); }
+ | CHAR_GROUP { $$ = new ParserVal(new CharGroupNode($1.sval)); }
  | exp OR exp { $$ = new ParserVal(new Or((TreeNode)$1.obj, (TreeNode)$3.obj)); }
  | exp CONCAT exp { $$ = new ParserVal(new Concat((TreeNode)$1.obj, (TreeNode)$3.obj)); }
- | exp exp { $$ = new ParserVal(new Concat((TreeNode)$1.obj, (TreeNode)$2.obj)); }
+// | exp exp { $$ = new ParserVal(new Concat((TreeNode)$1.obj, (TreeNode)$2.obj)); }
  | exp STAR { $$ = new ParserVal(new Star((TreeNode)$1.obj)); }
  | OPEN_BR exp CLOSE_BR { $$ = $2; }
 
 
 %%
 public Lexer lexer;
-public int grIndex = 0;
+public SymbolsTable sTable;
 
 void yyerror(String s) {
     throw new ParsingException(s);
@@ -56,12 +57,14 @@ int yylex() {
             } break;
             case Token.Type.CHAR: {
                 tokId = CHAR;
-                // TODO
-                yylval = new ParserVal(grIndex++);
+                sTable.registerGroup(new CharGroup(tok.data().charAt(0)));
+                yylval = new ParserVal(tok.data());
             } break;
             case Token.Type.CHAR_GROUP: {
-                tokId = CHAR;
-                yylval = new ParserVal(grIndex++);
+                tokId = CHAR_GROUP;
+                // TODO
+                // sTable.registerGroup(...);
+                yylval = new ParserVal(tok.data());
             } break;
         }
         return tokId;

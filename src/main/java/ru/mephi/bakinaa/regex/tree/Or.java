@@ -1,17 +1,15 @@
 package ru.mephi.bakinaa.regex.tree;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Or extends TreeNode {
     public Or(TreeNode left, TreeNode right) {
         addChild(left);
         addChild(right);
-        calculatePos();
     }
 
     @Override
-    protected void calculatePos() {
+    protected void calculateOwnPos() {
         if (children.size() != 2)
             throw new IllegalStateException();
 

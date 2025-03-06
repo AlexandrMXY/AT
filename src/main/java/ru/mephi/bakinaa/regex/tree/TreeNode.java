@@ -1,6 +1,7 @@
 package ru.mephi.bakinaa.regex.tree;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,15 +10,15 @@ import java.util.Set;
 
 @Getter
 public abstract class TreeNode {
-    protected List<TreeNode> children = new ArrayList<>();
-    protected TreeNode parent;
+    @Setter protected List<TreeNode> children = new ArrayList<>();
+    @Setter protected TreeNode parent;
 
     protected Set<Integer> firstpos = new HashSet<>();
     protected Set<Integer> lastpos = new HashSet<>();
 
     public boolean nullable;
 
-    protected void addChild(TreeNode child) {
+    public void addChild(TreeNode child) {
         if (child == null)
             return;
         if (child.parent == this)
@@ -29,7 +30,7 @@ public abstract class TreeNode {
         child.parent = this;
     }
 
-    protected void removeChild(TreeNode child) {
+    public void removeChild(TreeNode child) {
         if (child.parent != this)
             return;
 
@@ -37,5 +38,12 @@ public abstract class TreeNode {
         child.parent = null;
     }
 
-    protected abstract void calculatePos();
+
+    protected abstract void calculateOwnPos();
+
+    public void calcPos() {
+        for (TreeNode child : children)
+            child.calcPos();
+        calculateOwnPos();
+    }
 }
