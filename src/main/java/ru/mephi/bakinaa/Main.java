@@ -1,90 +1,6 @@
-//package ru.mephi.bakinaa;
-//
-//import ru.mephi.bakinaa.regex.RegExMatcher;
-//import ru.mephi.bakinaa.regex.chars.SymbolsTable;
-//import ru.mephi.bakinaa.regex.chars.CharGroup;
-//import ru.mephi.bakinaa.regex.tree.*;
-//import ru.mephi.bakinaa.regex.parser.*;
-//
-//import java.io.StringReader;
-//import java.util.Map;
-//
-//public class Main {
-//    public static void main(String[] args) {
-//        // a*(b|c)*a* #
-//        // 1  2 3  4  5
-//
-//        Lexer lexer = new Lexer(new StringReader("a*b*(aa*+b)"));
-//        var parser = new Parser(true);
-//        parser.lexer = lexer;
-//
-//        parser.run();
-//
-//        TreeNode parsed = (TreeNode) parser.yyval().obj;
-//        parsed = new Concat(parsed, new Char(parser.grIndex++));
-//        GVUtils.saveTree(parsed, "parsed.png");
-//
-//
-//
-//        // a*b*(aa*+b) #
-//        // 1 2  34  5  6
-//
-//        TreeNode root =
-//                new Concat(
-//                        new Concat(
-//                                new Concat(
-//                                        new Star(new Char(1)),
-//                                        new Star(new Char(2))
-//                                ),
-//                                new Or(
-//                                        new Concat(
-//                                                new Char(3),
-//                                                new Star(new Char(4))
-//                                        ),
-//                                        new Char(5)
-//                                )
-//                        ),
-//                        new Char(6)
-//                );
-//
-//        SymbolsTable st = new SymbolsTable(
-//                new CharGroup('a'), // 1
-//                new CharGroup('b')  // 2
-//        );
-//
-//        // a*b*(aa*+b) #
-//        // 1 2  34  5  6
-//
-//        Map<Integer, Integer> indexCharTable = Map.of(
-//                1, 1,
-//                2, 2,
-//                3, 1,
-//                4, 1,
-//                5, 2,
-//                6, SymbolsTable.EOL
-//        );
-//
-//        GVUtils.saveTree(root, "tree.png");
-//
-//        RegexDFA dfa = RegexDFA.compile(
-//                root,
-//                st,
-//                indexCharTable,
-//                6
-//        );
-//
-//        GVUtils.saveDFA(dfa, "dfa.png");
-//
-//        RegExMatcher matcher = new RegExMatcher(dfa.getInitialState(), st);
-//        System.out.println(matcher.matches("aabbccbbaa"));
-//        System.out.println(matcher.matches("aabbcacbbaa"));
-//    }
-//}
-//
-
-
 package ru.mephi.bakinaa;
 
+import ru.mephi.bakinaa.regex.DFAState;
 import ru.mephi.bakinaa.regex.RegEx;
 import ru.mephi.bakinaa.regex.RegExMatcher;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
@@ -93,15 +9,57 @@ import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.parser.*;
 
 import java.io.StringReader;
+import java.util.BitSet;
 import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        RegEx regex = RegEx.compile("a*b*(aa*|b)");
-//
+//        RegEx regex = RegEx.compile("a*b*(aa*|b)");
+        RegEx regex = RegEx.compile("a*b*(aa*|b)ab*b(a|b|d)*|e|f");
         System.out.println(regex.matcher("aaaabbbba").matches());
         System.out.println(regex.matcher("abababab").matches());
 
 //        GVUtils.saveTree(new Parser("a*b*(aa*|b)").buildTree(), "pr.png");
+
+
+        SymbolsTable st = new SymbolsTable();
+        st.registerGroup(new CharGroup('a'));
+        st.registerGroup(new CharGroup('b'));
+
+        int index = 1;
+        DFAState A = new DFAState(index++); //
+        DFAState B = new DFAState(index++);
+        DFAState C = new DFAState(index++);
+        DFAState D = new DFAState(index++);
+        DFAState E = new DFAState(index++);
+        DFAState F = new DFAState(true, index++);
+        DFAState G = new DFAState(true, index++);
+        DFAState H = new DFAState(index++);
+
+        A.transitions.put(1, H);
+        A.transitions.put(2, B);
+
+        B.transitions.put(1, H);
+        B.transitions.put(2, A);
+
+        C.transitions.put(1, E);
+        C.transitions.put(2, F);
+
+        D.transitions.put(1, E);
+        D.transitions.put(2, F);
+
+        E.transitions.put(1, F);
+        E.transitions.put(2, G);
+
+        F.transitions.put(1, F);
+        F.transitions.put(2, F);
+
+        G.transitions.put(1, G);
+        G.transitions.put(2, F);
+
+        H.transitions.put(1, C);
+        H.transitions.put(2, C);
+
+
     }
 }

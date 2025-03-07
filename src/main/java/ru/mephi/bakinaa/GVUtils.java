@@ -12,6 +12,7 @@ import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -80,5 +81,36 @@ public class GVUtils {
         g.add(mutNode(String.valueOf(System.identityHashCode(iState))).add(Color.GREEN));
 
         Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
+    }
+
+    @SneakyThrows
+    public static void saveDFA(DFAState iState, String file) {
+        MutableGraph g = mutGraph("tree").setDirected(true);
+        Set<Integer> visited = new HashSet<>();
+
+        iterateDFA(g, iState, visited);
+
+        g.add(mutNode(String.valueOf(iState.index)).add(Color.GREEN));
+
+        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
+    }
+
+    private static void iterateDFA(MutableGraph g, DFAState state, Set<Integer> visited) {
+        if (visited.contains(state.index))
+            return;
+        visited.add(state.index);
+
+        state.transitions.forEach((charId, targetState) -> {
+            g.add(
+                    mutNode(String.valueOf(state.index)).addLink(
+                            to(mutNode(String.valueOf(targetState.index)))
+                                    .with(Label.of(String.valueOf(charId)))
+                    )
+            );
+            iterateDFA(g, targetState, visited);
+        });
+
+        if (state.isFinal)
+            g.add(mutNode(String.valueOf(state.index)).add(Shape.BOX));
     }
 }
