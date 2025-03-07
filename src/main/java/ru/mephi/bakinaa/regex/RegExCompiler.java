@@ -3,7 +3,6 @@ package ru.mephi.bakinaa.regex;
 import ru.mephi.bakinaa.GVUtils;
 import ru.mephi.bakinaa.regex.chars.CharGroup;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
-import ru.mephi.bakinaa.regex.parser.Lexer;
 import ru.mephi.bakinaa.regex.parser.Parser;
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.RawNode;
@@ -46,8 +45,6 @@ public class RegExCompiler {
             System.out.printf("%d %s\n", k, v <= 0 ? v : symbolsTable.getGroup(v));
         });
 
-//        dbg();
-
         lastIndex = symbolsTable.getLastTreeIndex();
         root.calcPos();
         followPos = FollowPos.forTree(root, lastIndex);
@@ -64,36 +61,8 @@ public class RegExCompiler {
         return new RegEx(symbolsTable, initialState);
     }
 
-    private void dbg() {
-
-        root =
-                new Concat(
-                        new Concat(
-                                new Concat(
-                                        new Star(new Char(1)),
-                                        new Star(new Char(2))
-                                ),
-                                new Or(
-                                        new Concat(
-                                                new Char(3),
-                                                new Star(new Char(4))
-                                        ),
-                                        new Char(5)
-                                )
-                        ),
-                        new Char(6)
-                );
-    }
-
     private void buildTree() {
-        Lexer lexer = new Lexer(new StringReader(regexString));
-        Parser parser = new Parser(true);
-        parser.lexer = lexer;
-        parser.sTable = symbolsTable;
-
-        parser.run();
-
-        root = (TreeNode) parser.yyval().obj;
+        root = new Parser(regexString, symbolsTable).buildTree();
     }
 
     private void rebuildTree() {

@@ -97,9 +97,11 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-        RegEx regex = RegEx.compile("a*.b*.(a.a*|b)");
-
+        RegEx regex = RegEx.compile("a*b*(aa*|b)");
+//
         System.out.println(regex.matcher("aaaabbbba").matches());
         System.out.println(regex.matcher("abababab").matches());
+
+//        GVUtils.saveTree(new Parser("a*b*(aa*|b)").buildTree(), "pr.png");
     }
 }
