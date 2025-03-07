@@ -10,9 +10,6 @@ public class CharGroupNode extends RawNode {
     }
 
     @Override
-    protected void calculateOwnPos() {  }
-
-    @Override
     public TreeNode transform(TreeTransforamtionContext context) {
         // TODO
         throw new UnsupportedOperationException("Not impimented yet");

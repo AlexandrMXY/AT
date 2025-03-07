@@ -10,7 +10,8 @@ import java.util.Set;
 
 @Getter
 public abstract class TreeNode {
-    @Setter protected List<TreeNode> children = new ArrayList<>();
+    @Setter protected TreeNode left;
+    @Setter protected TreeNode right;
     @Setter protected TreeNode parent;
 
     protected Set<Integer> firstpos = new HashSet<>();
@@ -18,32 +19,13 @@ public abstract class TreeNode {
 
     public boolean nullable;
 
-    public void addChild(TreeNode child) {
-        if (child == null)
-            return;
-        if (child.parent == this)
-            return;
-        if (child.parent != null)
-            child.parent.removeChild(child);
-
-        children.add(child);
-        child.parent = this;
-    }
-
-    public void removeChild(TreeNode child) {
-        if (child.parent != this)
-            return;
-
-        children.remove(child);
-        child.parent = null;
-    }
-
-
     protected abstract void calculateOwnPos();
 
     public void calcPos() {
-        for (TreeNode child : children)
-            child.calcPos();
+        if (left != null)
+            left.calcPos();
+        if (right != null)
+            right.calcPos();
         calculateOwnPos();
     }
 }

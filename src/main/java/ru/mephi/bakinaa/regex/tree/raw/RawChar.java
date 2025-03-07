@@ -9,6 +9,7 @@ public class RawChar extends RawNode {
     public RawChar(char c) {
         this.c = c;
     }
+
     public RawChar(String c) {
         if (c.length() > 1)
             throw new IllegalArgumentException();
@@ -19,7 +20,4 @@ public class RawChar extends RawNode {
     public TreeNode transform(TreeTransforamtionContext context) {
         return new Char(context.symbolsTable.nextTreeIndex(context.symbolsTable.idOf(c)));
     }
-
-    @Override
-    protected void calculateOwnPos() { }
 }

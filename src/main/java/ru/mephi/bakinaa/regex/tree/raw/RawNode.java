@@ -12,4 +12,9 @@ public abstract class RawNode extends TreeNode {
         SymbolsTable symbolsTable;
     }
 
+
+    @Override
+    protected void calculateOwnPos() {
+        throw new UnsupportedOperationException();
+    }
 }

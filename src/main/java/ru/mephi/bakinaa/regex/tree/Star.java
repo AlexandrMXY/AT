@@ -4,19 +4,20 @@ import java.util.HashSet;
 
 public class Star extends TreeNode {
     public Star(TreeNode child) {
-        addChild(child);
+        setLeft(child);
     }
 
     @Override
     protected void calculateOwnPos() {
-        nullable = true;
-        if (children.size() != 1)
+        if (getRight() != null)
             throw new IllegalStateException();
-        firstpos = new HashSet<>(children.getFirst().firstpos);
-        lastpos = new HashSet<>(children.getFirst().lastpos);
+        nullable = true;
+
+        firstpos = new HashSet<>(getLeft().firstpos);
+        lastpos = new HashSet<>(getLeft().lastpos);
     }
 
     public TreeNode getChild() {
-        return children.getFirst();
+        return getLeft();
     }
 }

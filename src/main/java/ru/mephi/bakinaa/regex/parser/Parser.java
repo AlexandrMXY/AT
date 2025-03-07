@@ -23,7 +23,10 @@ public class Parser {
 
 
     public TreeNode buildTree() {
-        return consumeGroup().node();
+        var res = consumeGroup().node();
+        if (index < string.length)
+            throw new ParserException("Syntax error");
+        return res;
     }
 
 

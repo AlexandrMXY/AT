@@ -12,10 +12,10 @@ import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static guru.nidi.graphviz.model.Factory.*;
 
@@ -33,8 +33,7 @@ public class GVUtils {
     }
 
     private static void treeIter(MutableGraph g, TreeNode node, Function<TreeNode, String> label) {
-        for (TreeNode child : node.getChildren()) {
-
+        for (TreeNode child : Stream.of(node.getLeft(), node.getRight()).filter(Objects::nonNull).toList()) {
             g.add(
                 mutNode(String.valueOf(System.identityHashCode(node)))
                     .add(Label.of(label.apply(node)))

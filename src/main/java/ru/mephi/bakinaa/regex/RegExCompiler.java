@@ -82,13 +82,17 @@ public class RegExCompiler {
             node = rawNode.transform(context);
         }
 
-        List<TreeNode> newChildren = new ArrayList<>(node.getChildren().size());
-        for (TreeNode child : node.getChildren()) {
-            TreeNode transformed = transfromIter(child, context);
+        if (node.getLeft() != null) {
+            TreeNode transformed = transfromIter(node.getLeft(), context);
             transformed.setParent(node);
-            newChildren.add(transformed);
+            node.setLeft(transformed);
         }
-        node.setChildren(newChildren);
+        if (node.getRight() != null) {
+            TreeNode transformed = transfromIter(node.getRight(), context);
+            transformed.setParent(node);
+            node.setRight(transformed);
+        }
+
         return node;
     }
 

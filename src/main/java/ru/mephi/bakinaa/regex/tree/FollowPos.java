@@ -22,9 +22,12 @@ public class FollowPos {
     }
 
     private void iterate(TreeNode node) {
+        if (node == null)
+            return;
+
         if (node instanceof Concat concat) {
-            for (int i : concat.left().lastpos) {
-                followposMap.get(i).addAll(concat.right().firstpos);
+            for (int i : concat.getLeft().lastpos) {
+                followposMap.get(i).addAll(concat.getRight().firstpos);
             }
         }
         if (node instanceof Star star) {
@@ -33,8 +36,7 @@ public class FollowPos {
             }
         }
 
-        for (TreeNode child : node.children) {
-            iterate(child);
-        }
+        iterate(node.left);
+        iterate(node.right);
     }
 }

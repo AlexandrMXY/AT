@@ -4,21 +4,21 @@ import java.util.HashSet;
 
 public class Or extends TreeNode {
     public Or(TreeNode left, TreeNode right) {
-        addChild(left);
-        addChild(right);
+        setLeft(left);
+        setRight(right);
     }
 
     @Override
     protected void calculateOwnPos() {
-        if (children.size() != 2)
+        if (left == null || right == null)
             throw new IllegalStateException();
 
-        firstpos = new HashSet<>(children.getFirst().firstpos);
-        firstpos.addAll(children.getLast().firstpos);
+        firstpos = new HashSet<>(left.firstpos);
+        firstpos.addAll(right.firstpos);
 
-        lastpos = new HashSet<>(children.getLast().lastpos);
-        lastpos.addAll(children.getFirst().lastpos);
+        lastpos = new HashSet<>(right.lastpos);
+        lastpos.addAll(left.lastpos);
 
-        nullable = children.getFirst().nullable || children.getLast().nullable;
+        nullable = left.nullable || right.nullable;
     }
 }
