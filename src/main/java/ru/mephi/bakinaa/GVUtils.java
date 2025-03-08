@@ -9,7 +9,10 @@ import guru.nidi.graphviz.model.MutableGraph;
 import lombok.SneakyThrows;
 import ru.mephi.bakinaa.regex.DFAState;
 import ru.mephi.bakinaa.regex.tree.*;
+import ru.mephi.bakinaa.regex.tree.raw.CharGroupNode;
+import ru.mephi.bakinaa.regex.tree.raw.Plus;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
+import ru.mephi.bakinaa.regex.tree.raw.Repeat;
 
 import java.io.File;
 import java.util.*;
@@ -48,8 +51,16 @@ public class GVUtils {
             case Char n -> n.getFirstpos().toString();
             case Or n -> "|";
             case Star n -> "*";
+            case Plus n -> "+";
             case Concat n -> ".";
             case RawChar n -> "\"" + String.valueOf(n.c) + "\"";
+            case CharGroupNode n -> "[" + n.groupText + "]";
+            case EpsChar n -> "$";
+            case Capture n -> "#" + n.id;
+            case Progn n -> "/";
+            case Repeat n -> "{"
+                    + (n.getFrom() > 0 ? n.getFrom() : "") + ", "
+                    + (n.getTo() < Integer.MAX_VALUE ? n.getTo() : "") + "}";
             default -> "?";
         };
     }

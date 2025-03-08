@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-public abstract class TreeNode {
+public abstract class TreeNode implements Cloneable {
     @Setter protected TreeNode left;
     @Setter protected TreeNode right;
     @Setter protected TreeNode parent;
@@ -28,4 +28,28 @@ public abstract class TreeNode {
             right.calcPos();
         calculateOwnPos();
     }
+
+    public TreeNode copy() {
+        try {
+            TreeNode clone = (TreeNode) clone();
+            if (left != null) {
+                clone.left = left.copy();
+                clone.left.parent = clone;
+            }
+            if (right != null) {
+                clone.right = right.copy();
+                clone.right.parent = clone;
+            }
+
+            clone.firstpos = new HashSet<>(firstpos);
+            clone.lastpos = new HashSet<>(lastpos);
+
+            clone.parent = null;
+
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

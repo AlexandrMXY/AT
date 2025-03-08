@@ -4,7 +4,9 @@ import ru.mephi.bakinaa.regex.chars.CharGroup;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.CharGroupNode;
+import ru.mephi.bakinaa.regex.tree.raw.Plus;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
+import ru.mephi.bakinaa.regex.tree.raw.Repeat;
 
 import java.util.Stack;
 
@@ -12,6 +14,7 @@ public class Parser {
     private final char[] string;
     private int index = 0;
     private final SymbolsTable symbolsTable;
+    private int nextCaptureId = 0;
 
     public static final char ESCAPE_CHAR = '%';
 
@@ -47,8 +50,16 @@ public class Parser {
                 pushNode(stack, priorities, new CharGroupNode(token.data()));
                 continue;
             }
+            if (token.type() == Token.Type.EPS_CHAR) {
+                pushNode(stack, priorities, new EpsChar());
+                continue;
+            }
             if (token.type() == Token.Type.GROPU_OPEN) {
                 pushNode(stack, priorities, consumeGroup().node);
+                continue;
+            }
+            if (token.type() == Token.Type.CAPTURE_OPEN) {
+                pushNode(stack, priorities, new Capture(consumeGroup().node, nextCaptureId++));
                 continue;
             }
 
@@ -96,7 +107,9 @@ public class Parser {
     public boolean isUnary(Token token) {
         if (token == null)
             return false;
-        return token.type() == Token.Type.STAR;
+        return  token.type() == Token.Type.STAR ||
+                token.type() == Token.Type.PLUS ||
+                token.type() == Token.Type.REPEAT;
     }
 
     private TreeNode consumeOperation(Stack<Expr> stack) {
@@ -110,6 +123,18 @@ public class Parser {
                     if (!operand.isNode())
                         throw new ParserException("Syntax error");
                     return new Star(operand.node());
+                }
+                case PLUS -> {
+                    Expr operand = stack.pop();
+                    if (!operand.isNode())
+                        throw new ParserException("Syntax error");
+                    return new Plus(operand.node());
+                }
+                case REPEAT -> {
+                    Expr operand = stack.pop();
+                    if (!operand.isNode())
+                        throw new ParserException("Syntax error");
+                    return Repeat.fromString(operand.node(), op1.token().data());
                 }
 
                 default ->
@@ -134,6 +159,9 @@ public class Parser {
             case CONCAT -> {
                 return new Concat(op3.node(), op1.node());
             }
+            case PRONGN -> {
+                return new Progn(op3.node(), op1.node());
+            }
             default ->
                 throw new ParserException("Syntax error");
         }
@@ -154,18 +182,29 @@ public class Parser {
             case ESCAPE_CHAR ->
                 Token.character(string[index++]);
 
+            case '#' ->
+                string[index++] == '(' ? Token.captureOpen() : (Token)syntaxError();
             case '(' ->
                 Token.groupOpen();
             case ')' ->
                 Token.groupClose();
             case '*' ->
                 Token.star();
+            case '+' ->
+                Token.plus();
             case '|' ->
                 Token.or();
+            case '/' ->
+                Token.progn();
             case '.' ->
                 Token.concat();
             case '[' ->
                 Token.charGroup(readCharGroup());
+            case '$' ->
+                Token.eps();
+            case '{' ->
+                Token.repeat(readRepeatBracket());
+
 
             default ->
                     Token.character(c);
@@ -184,6 +223,23 @@ public class Parser {
         }
 
         return builder.toString();
+    }
+
+    private String readRepeatBracket() {
+        StringBuilder builder = new StringBuilder();
+
+        char c;
+        while ((c = string[index++]) != '}') {
+            if (Character.isWhitespace(c))
+                continue;
+            builder.append(c);
+        }
+
+        return builder.toString();
+    }
+
+    private Object syntaxError() {
+        throw new ParserException("Syntax error");
     }
 
     private record Expr(
