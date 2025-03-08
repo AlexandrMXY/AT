@@ -1,14 +1,14 @@
 package ru.mephi.bakinaa.regex.chars;
 
-import com.kitfox.svg.A;
+import lombok.NonNull;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 @ToString
-public class CharGroup {
+public class CharGroup implements Iterable<Character> {
     private final char from;
     private final char to;
 
@@ -35,6 +35,16 @@ public class CharGroup {
         return CompareResult.INTERSECT;
     }
 
+//    public List<CharGroup> splitIntersect(CharGroup second) {
+//        System.out.printf("[%c, %c] [%c, %c] ->", from, to, second.from, second.to);
+//        var res = splitIntersect0(second);
+//        for (CharGroup r : res)
+//            System.out.printf(" [%c, %c]", r.from, r.to);
+//        System.out.println();
+//        return res;
+//    }
+
+
     public List<CharGroup> splitIntersect(CharGroup second) {
         if (compare(second) != CompareResult.INTERSECT)
             throw new IllegalArgumentException();
@@ -42,15 +52,30 @@ public class CharGroup {
         if (second.from == second.to)
             return second.splitIntersect(this);
 
-        if (from == to && from == second.from) {
+        if (from == to) {
+            if (from == second.from) {
+                return List.of(
+                        new CharGroup(from, from),
+                        new CharGroup((char) (from + 1), second.to));
+            }
+            if (from == second.to) {
+                return List.of(
+                        new CharGroup(second.from, (char) (second.to - 1)),
+                        new CharGroup(to, to));
+            }
             return List.of(
+                    new CharGroup(second.from, (char) (from - 1)),
                     new CharGroup(from, from),
                     new CharGroup((char) (from + 1), second.to));
         }
-        if (from == to && from == second.to) {
+
+        if (from == second.to)
+            return second.splitIntersect(this);
+        if (to == second.from) {
             return List.of(
-                    new CharGroup(second.from, (char) (second.to - 1)),
-                    new CharGroup(to, to));
+                    new CharGroup(from, (char) (to - 1)),
+                    new CharGroup(to, to),
+                    new CharGroup((char) (to + 1), second.to));
         }
 
         char[] points = new char[] {from, to, second.from, second.to};
@@ -68,5 +93,25 @@ public class CharGroup {
         GREATER,
         EQUAL,
         INTERSECT
+    }
+
+    @Override
+    @NonNull
+    public Iterator<Character> iterator() {
+        return new Iter();
+    }
+
+    private class Iter implements Iterator<Character> {
+        char cur = from;
+
+        @Override
+        public boolean hasNext() {
+            return cur < to;
+        }
+
+        @Override
+        public Character next() {
+            return cur++;
+        }
     }
 }

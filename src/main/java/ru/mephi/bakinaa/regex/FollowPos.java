@@ -1,4 +1,8 @@
-package ru.mephi.bakinaa.regex.tree;
+package ru.mephi.bakinaa.regex;
+
+import ru.mephi.bakinaa.regex.tree.Concat;
+import ru.mephi.bakinaa.regex.tree.Star;
+import ru.mephi.bakinaa.regex.tree.TreeNode;
 
 import java.util.*;
 
@@ -26,17 +30,17 @@ public class FollowPos {
             return;
 
         if (node instanceof Concat concat) {
-            for (int i : concat.getLeft().lastpos) {
-                followposMap.get(i).addAll(concat.getRight().firstpos);
+            for (int i : concat.getLeft().getLastpos()) {
+                followposMap.get(i).addAll(concat.getRight().getFirstpos());
             }
         }
         if (node instanceof Star star) {
-            for (int i : star.getChild().lastpos) {
-                followposMap.get(i).addAll(star.getChild().firstpos);
+            for (int i : star.getChild().getLastpos()) {
+                followposMap.get(i).addAll(star.getChild().getFirstpos());
             }
         }
 
-        iterate(node.left);
-        iterate(node.right);
+        iterate(node.getLeft());
+        iterate(node.getRight());
     }
 }

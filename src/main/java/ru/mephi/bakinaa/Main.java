@@ -14,11 +14,13 @@ import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
-//        RegEx regex = RegEx.compile("a*b*(aa*|b)");
-        RegEx regex = RegEx.compile("abc/def#(d{1,1}(ef[qw]+))");
+//        System.out.println(new CharGroupParser("abc-gq-%-").parse());
 
-        System.out.println(regex.matcher("abc").matches());
-        System.out.println(regex.matcher("ac").matches());
+//        RegEx regex = RegEx.compile("a*b*(aa*|b)");
+        RegEx regex = RegEx.compile("[a-ke-zwer]*[q-r1-3&]*");
+//
+//        System.out.println(regex.matcher("abc").matches());
+//        System.out.println(regex.matcher("ac").matches());
 
     }
 }

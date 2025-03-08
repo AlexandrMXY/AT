@@ -8,6 +8,8 @@ import ru.mephi.bakinaa.regex.tree.raw.Plus;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
 import ru.mephi.bakinaa.regex.tree.raw.Repeat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 public class Parser {
@@ -46,8 +48,9 @@ public class Parser {
             }
             if (token.type() == Token.Type.CHAR_GROUP) {
                 // TODO
-                // symbolsTable.registerGroup(new CharGroup(token.data().charAt(0)));
-                pushNode(stack, priorities, new CharGroupNode(token.data()));
+                List<CharGroup> groups = new CharGroupParser(token.data()).parse();
+                symbolsTable.registerGroups(groups);
+                pushNode(stack, priorities, new CharGroupNode(groups));
                 continue;
             }
             if (token.type() == Token.Type.EPS_CHAR) {
@@ -78,6 +81,7 @@ public class Parser {
         }
         throw new ParserException("Syntax error");
     }
+
 
     private void pushNode(Stack<Expr> stack, Stack<Integer> priorities, TreeNode node) {
         if (!stack.empty() && (stack.peek().isNode() || isUnary(stack.peek().token))) {
@@ -134,7 +138,7 @@ public class Parser {
                     Expr operand = stack.pop();
                     if (!operand.isNode())
                         throw new ParserException("Syntax error");
-                    return Repeat.fromString(operand.node(), op1.token().data());
+                    return RepeatParser.createRepeat(operand.node(), op1.token().data());
                 }
 
                 default ->
@@ -216,7 +220,7 @@ public class Parser {
 
         char c;
         while ((c = string[index++]) != ']') {
-            if (c == ESCAPE_CHAR)
+            if (c == ESCAPE_CHAR && string[index] == ']')
                 builder.append(string[index++]);
             else
                 builder.append(c);

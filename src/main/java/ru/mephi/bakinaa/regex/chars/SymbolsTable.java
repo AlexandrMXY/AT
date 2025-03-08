@@ -51,6 +51,11 @@ public class SymbolsTable implements Iterable<Integer> {
         groups.add(group);
     }
 
+    public void registerGroups(List<CharGroup> groups) {
+        for (CharGroup g : groups)
+            registerGroup(g);
+    }
+
     public int nextTreeIndex(int charId) {
         int index = nextTreeIndex++;
         indexCharTable.put(index, charId);

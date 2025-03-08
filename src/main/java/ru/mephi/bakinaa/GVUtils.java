@@ -54,7 +54,7 @@ public class GVUtils {
             case Plus n -> "+";
             case Concat n -> ".";
             case RawChar n -> "\"" + String.valueOf(n.c) + "\"";
-            case CharGroupNode n -> "[" + n.groupText + "]";
+            case CharGroupNode n -> "[" + n.groups + "]";
             case EpsChar n -> "$";
             case Capture n -> "#" + n.id;
             case Progn n -> "/";
