@@ -6,8 +6,11 @@ import guru.nidi.graphviz.attribute.Shape;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
+import guru.nidi.graphviz.model.MutableNode;
 import lombok.SneakyThrows;
-import ru.mephi.bakinaa.regex.DFAState;
+import ru.mephi.bakinaa.regex.dfa.DFAState;
+import ru.mephi.bakinaa.regex.nfa.NFA;
+import ru.mephi.bakinaa.regex.nfa.NFATransition;
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.CharGroupNode;
 import ru.mephi.bakinaa.regex.tree.raw.Plus;
@@ -17,7 +20,6 @@ import ru.mephi.bakinaa.regex.tree.raw.Repeat;
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static guru.nidi.graphviz.model.Factory.*;
@@ -58,6 +60,7 @@ public class GVUtils {
             case EpsChar n -> "$";
             case Capture n -> "#" + n.id;
             case Progn n -> "/";
+            case Backreference n -> "\\\\" + n.captureId;
             case Repeat n -> "{"
                     + (n.getFrom() > 0 ? n.getFrom() : "") + ", "
                     + (n.getTo() < Integer.MAX_VALUE ? n.getTo() : "") + "}";
@@ -72,7 +75,7 @@ public class GVUtils {
 
     @SneakyThrows
     public static void saveDFA(DFAState iState, Map<Set<Integer>, DFAState> stateMap, String file) {
-        MutableGraph g = mutGraph("tree").setDirected(true);
+        MutableGraph g = mutGraph("dfa").setDirected(true);
 
         stateMap.forEach((k, fromState) -> {
             g.add(mutNode(String.valueOf(System.identityHashCode(fromState))).add(Label.of(k.toString())));
@@ -85,7 +88,7 @@ public class GVUtils {
             });
 
             if (fromState.isFinal)
-                g.add(mutNode(String.valueOf(System.identityHashCode(fromState))).add(Shape.BOX));
+                g.add(mutNode(String.valueOf(System.identityHashCode(fromState))).add(Shape.DOUBLE_CIRCLE));
         });
 
         g.add(mutNode(String.valueOf(System.identityHashCode(iState))).add(Color.GREEN));
@@ -95,7 +98,7 @@ public class GVUtils {
 
     @SneakyThrows
     public static void saveDFA(DFAState iState, String file) {
-        MutableGraph g = mutGraph("tree").setDirected(true);
+        MutableGraph g = mutGraph("dfa").setDirected(true);
         Set<Integer> visited = new HashSet<>();
 
         iterateDFA(g, iState, visited);
@@ -121,6 +124,46 @@ public class GVUtils {
         });
 
         if (state.isFinal)
-            g.add(mutNode(String.valueOf(state.index)).add(Shape.BOX));
+            g.add(mutNode(String.valueOf(state.index)).add(Shape.DOUBLE_CIRCLE));
+    }
+
+    @SneakyThrows
+    public static void saveNFA(NFA nfa, String file) {
+        MutableGraph g = mutGraph("nfa").setDirected(true);
+
+        MutableNode[] nodes = new MutableNode[nfa.getStates()];
+        for (int i = 0; i < nfa.getStates(); i++) {
+            nodes[i] = mutNode(String.valueOf(i));
+            g.add(nodes[i]);
+        }
+
+
+
+        nodes[nfa.getInitialStateId()].add(Color.GREEN);
+        nodes[nfa.getFinalStateId()].add(Shape.DOUBLE_CIRCLE);
+
+        for (int from = 0; from < nfa.getStates(); from++) {
+            int finalFrom = from;
+            nfa.getTransitions().get(from).forEach(transition -> {
+                Label label = switch (transition) {
+                    case NFATransition.StandardTransition t ->
+                        Label.of(String.valueOf(t.getCharId()));
+                    case NFATransition.EpsilonTransition t ->
+                        Label.of("e");
+                    case NFATransition.CaptureBeginTransition t ->
+                        Label.of("<" + t.getGroupId());
+                    case NFATransition.CaptureEndTransition t ->
+                            Label.of(">" + t.getGroupId());
+                    case NFATransition.BackreferenceTransition t ->
+                            Label.of("\\\\" + t.getGroupId());
+                    default ->
+                        Label.of("?");
+                };
+
+                nodes[finalFrom].addLink(to(nodes[transition.getTarget()]).with(label));
+            });
+        }
+
+        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
     }
 }

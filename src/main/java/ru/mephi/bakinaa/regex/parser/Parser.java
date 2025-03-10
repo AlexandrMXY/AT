@@ -6,9 +6,7 @@ import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.CharGroupNode;
 import ru.mephi.bakinaa.regex.tree.raw.Plus;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
-import ru.mephi.bakinaa.regex.tree.raw.Repeat;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -62,7 +60,11 @@ public class Parser {
                 continue;
             }
             if (token.type() == Token.Type.CAPTURE_OPEN) {
-                pushNode(stack, priorities, new Capture(consumeGroup().node, nextCaptureId++));
+                pushNode(stack, priorities, new Capture(consumeGroup().node, Integer.parseInt(token.data())));
+                continue;
+            }
+            if (token.type() == Token.Type.BACKREFERENCE) {
+                pushNode(stack, priorities, new Backreference(Integer.parseInt(token.data())));
                 continue;
             }
 
@@ -187,7 +189,7 @@ public class Parser {
                 Token.character(string[index++]);
 
             case '#' ->
-                string[index++] == '(' ? Token.captureOpen() : (Token)syntaxError();
+                readCapturChar();
             case '(' ->
                 Token.groupOpen();
             case ')' ->
@@ -242,8 +244,31 @@ public class Parser {
         return builder.toString();
     }
 
-    private Object syntaxError() {
+    private Token readCapturChar() {
+        if (index == string.length)
+            throw new ParserException("Syntax error");
+
+        if (string[index] == '(') {
+            index++;
+            return Token.captureOpen(String.valueOf(nextCaptureId++));
+        }
+        if (isDigit(string[index])) {
+            return Token.backreference(readNumber());
+        }
         throw new ParserException("Syntax error");
+    }
+
+    private String readNumber() {
+        StringBuilder builder = new StringBuilder();
+
+        while (index < string.length && isDigit(string[index]))
+            builder.append(string[index++]);
+
+        return builder.toString();
+    }
+
+    private boolean isDigit(char c) {
+        return '0' <= c && '9' >= c;
     }
 
     private record Expr(

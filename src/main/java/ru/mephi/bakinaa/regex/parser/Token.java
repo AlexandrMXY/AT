@@ -6,7 +6,6 @@ public record Token(
         Type type,
         String data
 ) {
-    private static final Token captureOpen = new Token(Type.CAPTURE_OPEN, null);
     private static final Token groupOpen = new Token(Type.GROPU_OPEN, null);
     private static final Token groupClose = new Token(Type.GROUP_CLOSE, null);
     private static final Token star = new Token(Type.STAR, null);
@@ -17,8 +16,8 @@ public record Token(
     private static final Token prong = new Token(Type.PRONGN, null);
     private static final Token eps = new Token(Type.EPS_CHAR, null);
 
-    public static Token captureOpen() {
-        return captureOpen;
+    public static Token captureOpen(String id) {
+        return new Token(Type.CAPTURE_OPEN, id);
     }
 
     public static Token groupOpen() {
@@ -67,6 +66,10 @@ public record Token(
         return new Token(Type.CHAR_GROUP, s);
     }
 
+    public static Token backreference(String s) {
+        return new Token(Type.BACKREFERENCE, s);
+    }
+
     public static Token repeat(String arg) {
         return new Token(Type.REPEAT, arg);
     }
@@ -84,7 +87,8 @@ public record Token(
         END(0, false),
         CHAR(0, false),
         CHAR_GROUP(0, false),
-        EPS_CHAR(0, false);
+        EPS_CHAR(0, false),
+        BACKREFERENCE(0, false);
 
         public final int priority;
         public final boolean isOperation;

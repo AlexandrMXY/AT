@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.regex;
+package ru.mephi.bakinaa.regex.dfa;
 
 import java.util.HashMap;
 import java.util.Map;
