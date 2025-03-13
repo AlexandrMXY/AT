@@ -148,6 +148,7 @@ public class DfaRegEx implements RegEx {
         for (int i = 0; i < result.getStates(); i++)
             reachable.add(false);
         reachable.set(result.getInitialState(), true);
+
         reachable.set(result.getStubId(), true);
 
         for (int resCharId = 0; resCharId <= resSt.lastGroupId(); resCharId++) {
@@ -173,7 +174,7 @@ public class DfaRegEx implements RegEx {
                     int fromResId = dfaProdId(fromId1, fromId2);
                     result.addTransition(fromResId, toResId, resCharId);
                     if (reachable.get(fromResId))
-                        reachable.set(toResId, true);
+                        updateReachable(reachable, result, toResId);
                 }
             }
         }
@@ -189,7 +190,15 @@ public class DfaRegEx implements RegEx {
         return new DfaRegEx(resSt, result);
     }
 
+    private void updateReachable(List<Boolean> reachable, DFA dfa, int stateId) {
+        reachable.set(stateId, true);
+        dfa.getTransitions().get(stateId).forEach((charId, toId) -> {
+            if (!reachable.get(toId))
+                updateReachable(reachable, dfa, toId);
+        });
+    }
+
     private int dfaProdId(int first, int second) {
-        return first * dfa.getStates() + second;
+        return first + second * dfa.getStates();
     }
 }

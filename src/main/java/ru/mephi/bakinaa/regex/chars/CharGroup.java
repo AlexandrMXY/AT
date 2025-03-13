@@ -79,13 +79,27 @@ public record CharGroup  (
                     new CharGroup(to, to),
                     new CharGroup((char) (to + 1), second.to));
         }
+        if (to == second.to) {
+            char min = (char) Math.min(from, second.from);
+            char max = (char) Math.max(from, second.from);
+            return List.of(
+                    new CharGroup(min, (char) (max - 1)),
+                    new CharGroup(max, to));
+        }
+        if (from == second.from) {
+            char min = (char) Math.min(to, second.to);
+            char max = (char) Math.max(to, second.to);
+            return List.of(
+                    new CharGroup(from, min),
+                    new CharGroup((char) (min + 1), max));
+        }
 
         char[] points = new char[] {from, to, second.from, second.to};
         Arrays.sort(points);
 
         return List.of(
-                new CharGroup(points[0], points[1]),
-                new CharGroup((char) (points[1] + 1), points[2]),
+                new CharGroup(points[0], (char) (points[1] - 1)),
+                new CharGroup(points[1], points[2]),
                 new CharGroup((char) (points[2] + 1), points[3])
         );
     }

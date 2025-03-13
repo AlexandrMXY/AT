@@ -37,10 +37,20 @@ public class CaptureBuffer {
         }
     }
 
+    public void nextChars(int cnt) {
+        for (int grId : activeCaptures) {
+            groups.get(grId).to += cnt;
+        }
+    }
+
     public void backstep() {
+        backstep(1);
+    }
+
+    public void backstep(int cnt) {
         for (int grId : activeCaptures) {
             var gr = groups.get(grId);
-            gr.to--;
+            gr.to -= cnt;
             if (gr.from > gr.to) {
                 groups.remove(grId);
                 localBuffer.push(grId);

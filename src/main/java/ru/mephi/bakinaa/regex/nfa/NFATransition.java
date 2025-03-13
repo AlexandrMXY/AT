@@ -106,13 +106,18 @@ public abstract class NFATransition {
 
         @Override
         public boolean move(StringHolder stringHolder, CaptureBuffer captureBuffer) {
-            return stringHolder.tryConsume(captureBuffer.getCaptured(groupId));
-//            return true;
+            CaptureBuffer.GroupInfo captured = captureBuffer.getCaptured(groupId);
+            boolean consumed = stringHolder.tryConsume(captured);
+            if (consumed)
+                captureBuffer.nextChars(captured.len());
+            return consumed;
         }
 
         @Override
         public void backstep(StringHolder stringHolder, CaptureBuffer captureBuffer) {
-            stringHolder.backstep(captureBuffer.getCaptured(groupId));
+            CaptureBuffer.GroupInfo captured = captureBuffer.getCaptured(groupId);
+            stringHolder.backstep(captured);
+            captureBuffer.backstep(captured.len());
         }
     }
 }

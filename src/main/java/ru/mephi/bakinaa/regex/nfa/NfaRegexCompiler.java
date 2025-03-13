@@ -56,8 +56,11 @@ public class NfaRegexCompiler implements RegExCompiler {
                 nfa.addEpsiolnTransition(left.finalState(), right.initialState());
             }
             case Star star -> {
-                result = left;
-                nfa.addEpsiolnTransition(result.finalState(), result.initialState());
+                result = new StatesPair(nfa.addNode(), nfa.addNode());
+                nfa.addEpsiolnTransition(left.finalState(), left.initialState());
+                nfa.addEpsiolnTransition(result.initialState(), left.initialState());
+                nfa.addEpsiolnTransition(left.finalState(), result.finalState());
+                nfa.addEpsiolnTransition(result.initialState(), result.finalState());
             }
             case Char c -> {
                 result = new StatesPair(nfa.addNode(), nfa.addNode());

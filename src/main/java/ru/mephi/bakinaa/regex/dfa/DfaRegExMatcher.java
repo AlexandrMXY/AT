@@ -3,6 +3,7 @@ package ru.mephi.bakinaa.regex.dfa;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.regex.RegExMatcher;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
+import ru.mephi.bakinaa.regex.nfa.CaptureGroups;
 
 @RequiredArgsConstructor
 public class DfaRegExMatcher implements RegExMatcher {
@@ -24,5 +25,10 @@ public class DfaRegExMatcher implements RegExMatcher {
         }
 
         return dfa.isFinal(state);
+    }
+
+    @Override
+    public CaptureGroups getCaptures() {
+        return new CaptureGroups();
     }
 }

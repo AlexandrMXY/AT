@@ -27,11 +27,14 @@ public class Parser {
 
 
     public TreeNode buildTree() {
+        if (string.length == 0)
+            return new EpsChar();
         var res = consumeGroup().node();
         if (index < string.length)
             throw new ParserException("Syntax error");
         return res;
     }
+
 
 
     private Expr consumeGroup() {

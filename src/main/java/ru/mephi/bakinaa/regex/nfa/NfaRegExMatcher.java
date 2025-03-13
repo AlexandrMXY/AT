@@ -16,6 +16,8 @@ public class NfaRegExMatcher implements RegExMatcher {
     private final Stack<Integer> states = new Stack<>();
     private final Stack<NFATransition> transitions = new Stack<>();
 
+    private CaptureGroups captureGroups = new CaptureGroups();
+
     public NfaRegExMatcher(NFA nfa, SymbolsTable symbolsTable, String string) {
         this.nfa = nfa;
         this.str = new StringHolder(symbolsTable, string);
@@ -27,6 +29,7 @@ public class NfaRegExMatcher implements RegExMatcher {
     public boolean matches() {
         while (!states.empty()) {
             if (states.peek() == nfa.getFinalStateId()) {
+                initCapture();
                 return true;
             }
             step();
@@ -34,12 +37,17 @@ public class NfaRegExMatcher implements RegExMatcher {
         return false;
     }
 
-    public Map<Integer, String> getCaptures() {
+    private void initCapture() {
         Map<Integer, String> res = new HashMap<>();
         captureBuffer.getGroups().forEach((id, gr) -> {
             res.put(id, str.substring(captureBuffer.getCaptured(id)));
         });
-        return res;
+        captureGroups = new CaptureGroups(res);
+    }
+
+    @Override
+    public CaptureGroups getCaptures() {
+        return captureGroups;
     }
 
     private void step() {
