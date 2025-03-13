@@ -30,4 +30,7 @@ public class CharGroupNode extends RawNode {
                 .reduce(Or::new)
                 .orElseGet(EpsChar::new);
     }
+
+    @Override
+    public void reverse() {}
 }

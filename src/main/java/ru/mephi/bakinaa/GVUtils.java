@@ -8,14 +8,12 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 import lombok.SneakyThrows;
+import ru.mephi.bakinaa.regex.dfa.DFA;
 import ru.mephi.bakinaa.regex.dfa.DFAState;
 import ru.mephi.bakinaa.regex.nfa.NFA;
 import ru.mephi.bakinaa.regex.nfa.NFATransition;
 import ru.mephi.bakinaa.regex.tree.*;
-import ru.mephi.bakinaa.regex.tree.raw.CharGroupNode;
-import ru.mephi.bakinaa.regex.tree.raw.Plus;
-import ru.mephi.bakinaa.regex.tree.raw.RawChar;
-import ru.mephi.bakinaa.regex.tree.raw.Repeat;
+import ru.mephi.bakinaa.regex.tree.raw.*;
 
 import java.io.File;
 import java.util.*;
@@ -92,6 +90,59 @@ public class GVUtils {
         });
 
         g.add(mutNode(String.valueOf(System.identityHashCode(iState))).add(Color.GREEN));
+
+        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
+    }
+
+    @SneakyThrows
+    public static void saveDFA(DFA dfa, String file) {
+        MutableGraph g = mutGraph("dfa").setDirected(true);
+
+        MutableNode[] nodes = new MutableNode[dfa.getStates()];
+        for (int i = 0; i < dfa.getStates(); i++) {
+            nodes[i] = mutNode(String.valueOf(i));
+            g.add(nodes[i]);
+        }
+
+        nodes[dfa.getInitialState()].add(Color.GREEN);
+
+        for (int i = 0; i < dfa.getStates(); i++) {
+            int fromId = i;
+            dfa.getTransitions().get(fromId).forEach((charId, toId) -> {
+                nodes[fromId].addLink(to(nodes[toId]).with(Label.of(String.valueOf(charId))));
+            });
+
+            if (dfa.isFinal(i))
+                nodes[i].add(Shape.DOUBLE_CIRCLE);
+        }
+
+        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
+    }
+
+    @SneakyThrows
+    public static void saveDFA(DFA dfa, Map<Set<Integer>, Integer> names, String file) {
+        MutableGraph g = mutGraph("dfa").setDirected(true);
+
+        MutableNode[] nodes = new MutableNode[dfa.getStates()];
+        for (int i = 0; i < dfa.getStates(); i++) {
+            nodes[i] = mutNode(String.valueOf(i));
+            g.add(nodes[i]);
+        }
+
+        nodes[dfa.getInitialState()].add(Color.GREEN);
+
+        names.forEach((set, node) -> {
+            nodes[node].setName(Label.of(set.toString()));
+        });
+
+        for (int i = 0; i < dfa.getStates(); i++) {
+            int fromId = i;
+            dfa.getTransitions().get(fromId).forEach((charId, toId) -> {
+                nodes[fromId].addLink(to(nodes[toId]).with(Label.of(String.valueOf(charId))));
+            });
+            if (dfa.isFinal(i))
+                nodes[i].add(Shape.DOUBLE_CIRCLE);
+        }
 
         Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
     }

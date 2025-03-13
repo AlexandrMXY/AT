@@ -20,4 +20,7 @@ public class Star extends TreeNode {
     public TreeNode getChild() {
         return getLeft();
     }
+
+    @Override
+    public void reverse() {}
 }

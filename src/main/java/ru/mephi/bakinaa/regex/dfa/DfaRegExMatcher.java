@@ -6,23 +6,23 @@ import ru.mephi.bakinaa.regex.chars.SymbolsTable;
 
 @RequiredArgsConstructor
 public class DfaRegExMatcher implements RegExMatcher {
-    private final DFAState initState;
+    private final DFA dfa;
     private final SymbolsTable symbolsTable;
     private final String string;
 
     @Override
     public boolean matches() {
-        DFAState state = initState;
+        int state = dfa.getInitialState();
 
         for (char c : string.toCharArray()) {
             int cId = symbolsTable.idOf(c);
             if (cId == SymbolsTable.UNKNOWN_CHAR)
                 return false;
-            state = state.transitions.get(cId);
-            if (state == null)
+            state = dfa.move(state, cId);
+            if (state < 0)
                 return false;
         }
 
-        return state.isFinal;
+        return dfa.isFinal(state);
     }
 }

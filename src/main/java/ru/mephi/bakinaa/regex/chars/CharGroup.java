@@ -7,18 +7,20 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-@ToString
-public class CharGroup implements Iterable<Character> {
-    private final char from;
-    private final char to;
+
+public record CharGroup  (
+    char from,
+    char to
+) implements Iterable<Character> {
+
 
     public CharGroup(char c) {
-        from = c;
-        to = c;
+        this(c, c);
     }
-    public CharGroup(char first, char second) {
-        from = first <= second ? first : second;
-        to = first >= second ? first : second;
+
+    public CharGroup(char from, char to) {
+        this.from = from <= to ? from : to;
+        this.to = from >= to ? from : to;
     }
 
     public boolean isCharInsideGroup(char c) {

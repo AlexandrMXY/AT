@@ -13,4 +13,7 @@ public class Char extends TreeNode {
 
     @Override
     protected void calculateOwnPos() {}
+
+    @Override
+    public void reverse() {}
 }

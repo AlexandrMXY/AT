@@ -13,4 +13,7 @@ public class Plus extends RawNode {
     public TreeNode transform(TreeTransforamtionContext context) {
         return new Concat(left.copy(), new Star(left));
     }
+
+    @Override
+    public void reverse() {}
 }

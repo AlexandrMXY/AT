@@ -23,6 +23,7 @@ public class CommonRegExCompiler implements RegExCompiler {
 
     private final Set<Integer> capturesGroups = new HashSet<>();
     private boolean forceNfa = false;
+    private boolean reversed = false;
 
 
     public CommonRegExCompiler(String regexString) {
@@ -33,6 +34,11 @@ public class CommonRegExCompiler implements RegExCompiler {
         this(regexString);
         this.forceNfa = forceNfa;
     }
+    public CommonRegExCompiler(String regexString, boolean forceNfa, boolean reversed) {
+        this(regexString, forceNfa);
+        this.reversed = reversed;
+    }
+
 
     public RegEx compile() {
         buildTree();
@@ -69,6 +75,9 @@ public class CommonRegExCompiler implements RegExCompiler {
     }
 
     private TreeNode transfromIter(TreeNode node, RawNode.TreeTransforamtionContext context) {
+        if (reversed)
+            node.reverse();
+
         if (node instanceof RawNode rawNode) {
             node = rawNode.transform(context);
         }

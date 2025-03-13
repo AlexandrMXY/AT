@@ -10,14 +10,13 @@ public class DfaRegexCompiler {
     private final TreeNode root;
     private final SymbolsTable symbolsTable;
 
-    private final Map<Set<Integer>, DFAState> states = new HashMap<>();
-    private DFAState initialState = new DFAState(false, 1);
-    private final DFAState stubState = new DFAState(false, 0);
+    private final Map<Set<Integer>, Integer> states = new HashMap<>();
+
+    private DFA dfa = new DFA(0, 1, 2);
 
     private FollowPos followPos;
     private int lastIndex = -1;
 
-    private int nextStateIndex = 2;
 
     public DfaRegexCompiler(TreeNode root, SymbolsTable symbolsTable) {
         this.root = root;
@@ -36,12 +35,12 @@ public class DfaRegexCompiler {
             System.out.printf("%d %s\n", i, followPos.get(i).toString());
 
         buildDFA();
-        GVUtils.saveDFA(initialState, states, "3.png");
+        GVUtils.saveDFA(dfa, states, "3.png");
 
         minimizeDFA();
-        GVUtils.saveDFA(initialState, "4.png");
+        GVUtils.saveDFA(dfa, "4.png");
 
-        return new DfaRegEx(symbolsTable, initialState);
+        return new DfaRegEx(symbolsTable, dfa);
     }
 
     private void buildDFA() {
@@ -49,12 +48,12 @@ public class DfaRegexCompiler {
 
         Queue<Set<Integer>> statesQueue = new ArrayDeque<>();
         statesQueue.add(root.getFirstpos());
-        states.put(root.getFirstpos(), initialState);
-        states.put(new HashSet<>(), stubState);
+        statesQueue.add(new HashSet<>());
 
-        for (int charId : symbolsTable) {
-            stubState.transitions.put(charId, stubState);
-        }
+        states.put(root.getFirstpos(), dfa.getInitialState());
+        states.put(new HashSet<>(), dfa.getStubId());
+
+        dfa.setFinal(dfa.getInitialState(), root.getFirstpos().contains(eolCharIndex));
 
         while (!statesQueue.isEmpty()) {
             Set<Integer> stateId = statesQueue.poll();
@@ -80,17 +79,21 @@ public class DfaRegexCompiler {
 
     private boolean addTransition(Set<Integer> fromState, Set<Integer> toState, int charId, boolean isFinal) {
         boolean newStateCreated = false;
+        int toStateId;
         if (!states.containsKey(toState)) {
-            states.put(toState, new DFAState(isFinal, nextStateIndex++));
+            states.put(toState, toStateId = dfa.addState(isFinal));
             newStateCreated = true;
+        } else {
+            toStateId = states.get(toState);
         }
 
-        states.get(fromState).transitions.put(charId, states.get(toState));
+        dfa.addTransition(states.get(fromState), toStateId, charId);
+
         return newStateCreated;
     }
 
     private void minimizeDFA() {
-        initialState = new DFAMinimizer(states, symbolsTable).minimize();
+        dfa = new DFAMinimizer(dfa, symbolsTable).minimize();
     }
 
 

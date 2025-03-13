@@ -20,4 +20,7 @@ public class RawChar extends RawNode {
     public TreeNode transform(TreeTransforamtionContext context) {
         return new Char(context.symbolsTable.nextTreeIndex(context.symbolsTable.idOf(c)));
     }
+
+    @Override
+    public void reverse() {}
 }

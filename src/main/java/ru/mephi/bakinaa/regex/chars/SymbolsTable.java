@@ -1,6 +1,7 @@
 package ru.mephi.bakinaa.regex.chars;
 
 import lombok.Getter;
+import lombok.NonNull;
 import ru.mephi.bakinaa.regex.chars.CharGroup;
 
 import java.util.*;
@@ -25,11 +26,28 @@ public class SymbolsTable implements Iterable<Integer> {
     }
 
     public CharGroup getGroup(int id) {
+        if (id < 1)
+            return null;
         return groups.get(id - 1);
     }
 
     public int eol() {
         return EOL;
+    }
+
+    public int lastGroupId() {
+        return groups.size();
+    }
+
+    public int ifOf(CharGroup g) {
+        if (g == null)
+            return 0;
+        int id = idOf(g.from());
+        if (id == UNKNOWN_CHAR)
+            return UNKNOWN_CHAR;
+        if (!getGroup(id).isCharInsideGroup(g.to()))
+            return UNKNOWN_CHAR;
+        return id;
     }
 
     public void registerGroup(CharGroup group) {
@@ -70,7 +88,45 @@ public class SymbolsTable implements Iterable<Integer> {
         return nextTreeIndex - 1;
     }
 
+    public SymbolsTable multiply(SymbolsTable other) {
+        SymbolsTable res = new SymbolsTable();
+        for (var g : groups)
+            res.registerGroup(g);
+        for (var g : other.groups)
+            res.registerGroup(g);
+        return res;
+    }
+
+    public String charAsString(int charId) {
+        if (charId == 0)
+            return "";
+        CharGroup g = groups.get(charId - 1);
+        if (g.from() == g.to())
+            return String.valueOf(g.from());
+        return "[" + escapedChar(g.from()) + "-" + escapedChar(g.to()) + "]";
+    }
+
+    private String escapedChar(char c) {
+        if (c == '%' || c == '-' || c == ']')
+            return "%" + c;
+        return String.valueOf(c);
+    }
+
+    public Set<Integer> getIdsOf(CharGroup g) {
+        Set<Integer> res = new HashSet<>();
+        char firstUnconsumed = g.from();
+        while (firstUnconsumed <= g.to()) {
+            int index = idOf(firstUnconsumed);
+            if (index < 1)
+                return null;
+            res.add(index);
+            firstUnconsumed = (char) (getGroup(index).to() + 1);
+        }
+        return res;
+    }
+
     @Override
+    @NonNull
     public Iterator<Integer> iterator() {
         return new Iter();
     }

@@ -11,4 +11,7 @@ public class Backreference extends TreeNode {
     protected void calculateOwnPos() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void reverse() {}
 }

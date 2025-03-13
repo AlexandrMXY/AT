@@ -13,4 +13,7 @@ public class EpsChar extends TreeNode {
         firstpos = new HashSet<>();
         lastpos = new HashSet<>();
     }
+
+    @Override
+    public void reverse() {}
 }

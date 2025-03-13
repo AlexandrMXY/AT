@@ -10,8 +10,8 @@ import java.util.Set;
 
 @Getter
 public abstract class TreeNode implements Cloneable {
-    @Setter protected TreeNode left;
-    @Setter protected TreeNode right;
+    protected TreeNode left;
+    protected TreeNode right;
     @Setter protected TreeNode parent;
 
     protected Set<Integer> firstpos = new HashSet<>();
@@ -52,4 +52,19 @@ public abstract class TreeNode implements Cloneable {
         }
     }
 
+    public void setLeft(TreeNode left) {
+        left.parent = this;
+        this.left = left;
+    }
+
+    public void setRight(TreeNode right) {
+        right.parent = this;
+        this.right = right;
+    }
+
+    public void reverse() {
+        TreeNode temp = right;
+        right = left;
+        left = temp;
+    }
 }

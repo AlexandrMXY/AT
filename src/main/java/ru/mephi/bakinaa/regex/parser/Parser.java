@@ -5,6 +5,7 @@ import ru.mephi.bakinaa.regex.chars.SymbolsTable;
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.CharGroupNode;
 import ru.mephi.bakinaa.regex.tree.raw.Plus;
+import ru.mephi.bakinaa.regex.tree.raw.Progn;
 import ru.mephi.bakinaa.regex.tree.raw.RawChar;
 
 import java.util.List;

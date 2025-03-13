@@ -3,9 +3,10 @@ package ru.mephi.bakinaa.regex.tree.raw;
 import lombok.Getter;
 import ru.mephi.bakinaa.regex.tree.*;
 
+@Getter
 public class Repeat extends RawNode {
-    @Getter int from;
-    @Getter int to;
+    int from;
+    int to;
 
     public Repeat(TreeNode node, int from, int to) {
         setLeft(node);
@@ -41,4 +42,7 @@ public class Repeat extends RawNode {
 
         return new Concat(createOptional(cnt / 2), createOptional(cnt / 2 + cnt % 2));
     }
+
+    @Override
+    public void reverse() {}
 }

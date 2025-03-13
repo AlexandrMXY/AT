@@ -14,4 +14,14 @@ public class NfaRegEx implements RegEx {
     public RegExMatcher matcher(String string) {
         return new NfaRegExMatcher(nfa, symbolsTable, string);
     }
+
+    @Override
+    public String restore() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public RegEx subtract(RegEx other) {
+        throw new UnsupportedOperationException();
+    }
 }

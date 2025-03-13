@@ -19,4 +19,7 @@ public class Capture extends TreeNode {
     protected void calculateOwnPos() {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void reverse() {}
 }

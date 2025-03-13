@@ -7,49 +7,52 @@ import java.util.function.Consumer;
 
 
 public class DFAMinimizer {
-    public static final int INITIAL_STATE_ID = 1;
-    private final Map<Set<Integer>, DFAState> statesMap;
+//    private final Map<Set<Integer>, DFAState> statesMap;
     private final SymbolsTable symbolsTable;
 
-    private int statesCnt;
-    private DFAState[] states;
+    private final int statesCnt;
+//    private DFAState[] states;
     // invEdges[targetEdgeId].get(charId) -> sourceEdgeIds
-    private List<Map<Integer, List<Integer>>> invEdges;
-    private BitSet marked;
+    private final List<Map<Integer, List<Integer>>> invEdges;
+    private final BitSet marked;
+    private final DFA dfa;
 
-    public DFAMinimizer(Map<Set<Integer>, DFAState> statesMap, SymbolsTable symbolsTable) {
-        this.statesMap = statesMap;
-        this.symbolsTable = symbolsTable;
-        init();
+    private final List<Boolean> reachable;
+//    public DFAMinimizer(Map<Set<Integer>, DFAState> statesMap, SymbolsTable symbolsTable) {
+//        this.statesMap = statesMap;
+//        this.symbolsTable = symbolsTable;
+//        init();
+//    }
+
+    public DFAMinimizer(DFA dfa, SymbolsTable symbolsTable) {
+        this(dfa, symbolsTable, null);
     }
 
-    private void init() {
-        statesCnt = statesMap.size();
-        states = new DFAState[statesCnt];
+    public DFAMinimizer(DFA dfa, SymbolsTable symbolsTable, List<Boolean> reachable) {
+        this.dfa = dfa;
+        this.symbolsTable = symbolsTable;
+        this.reachable = reachable;
+        statesCnt = dfa.getStates();
         invEdges = new ArrayList<>(statesCnt);
         marked = new BitSet(statesCnt * statesCnt);
 
-        statesMap.forEach((k, v) -> states[v.index] = v);
-
         for (int i = 0; i < statesCnt; i++)
             invEdges.add(new HashMap<>());
-
-        for (DFAState state : states) {
-            state.transitions.forEach((charId, nextState) -> {
-                invEdges.get(nextState.index).computeIfAbsent(charId, ArrayList::new);
-                invEdges.get(nextState.index).get(charId).add(state.index);
+        for (int i = 0; i < statesCnt; i++) {
+            int fromId = i;
+            dfa.getTransitions().get(i).forEach((charId, toId) -> {
+                invEdges.get(toId).computeIfAbsent(charId, ArrayList::new);
+                invEdges.get(toId).get(charId).add(fromId);
             });
         }
-
-
     }
 
-    public DFAState minimize() {
+    public DFA minimize() {
         Queue<Pair> queue = new ArrayDeque<>();
 
         for (int i = 0; i < statesCnt; i++) {
             for (int j = 0; j < statesCnt; j++) {
-                if (!isMarked(i, j) && (states[i].isFinal != states[j].isFinal)) {
+                if (!isMarked(i, j) && (dfa.isFinal(i) != dfa.isFinal(j))) {
                     setMarked(i, j);
                     setMarked(j, i);
                     queue.add(new Pair(i, j));
@@ -77,6 +80,8 @@ public class DFAMinimizer {
         int nextComponentIndex = 1;
 
         for (int i = 0; i < statesCnt; i++) {
+            if (reachable != null && !reachable.get(i))
+                continue;
             if (components[i] == 0) {
                 components[i] = nextComponentIndex++;
                 for (int j = i + 1; j < statesCnt; j++) {
@@ -100,25 +105,28 @@ public class DFAMinimizer {
         return buildDFA(components, nextComponentIndex - 1);
     }
 
-    private DFAState buildDFA(int[] components, int componenstsCnt) {
-        DFAState[] resultStates = new DFAState[componenstsCnt];
-        for (int i = 0; i < componenstsCnt; i++)
-            resultStates[i] = new DFAState(i);
+    private DFA buildDFA(int[] components, int componenstsCnt) {
+        DFA result = new DFA(
+                components[dfa.getInitialState()] - 1,
+                components[dfa.getStubId()] - 1,
+                componenstsCnt);
 
         for (int i = 0; i < components.length; i++) {
-            int finalI = i;
-            states[i].transitions.forEach((charId, nextState) -> {
-                resultStates[components[finalI] - 1].transitions
-                        .put(charId, resultStates[components[nextState.index] - 1]);
+            if (reachable != null && !reachable.get(i))
+                continue;
+
+            int fromId = i;
+            dfa.getTransitions().get(i).forEach((charId, toId) -> {
+                result.addTransition(components[fromId] - 1, components[toId] - 1, charId);
             });
 
-            if (states[i].isFinal) {
-                resultStates[components[i] - 1].isFinal = true;
-            }
+            if (dfa.isFinal(i))
+                result.setFinal(components[i] - 1, true);
         }
 
-        return resultStates[components[INITIAL_STATE_ID] - 1];
+        return result;
     }
+
 
     private void iterateReversTransitions(int to, int charId, Consumer<Integer> fn) {
         var sources = invEdges.get(to).get(charId);

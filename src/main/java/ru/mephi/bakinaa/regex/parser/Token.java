@@ -75,14 +75,14 @@ public record Token(
     }
 
     public enum Type {
-        CAPTURE_OPEN(4, false),
-        GROPU_OPEN(4, false),
-        GROUP_CLOSE(4, false),
-        STAR(3, true),
-        PLUS(3, true),
-        REPEAT(3, true),
-        CONCAT(2, true),
-        OR(1, true),
+        CAPTURE_OPEN(5, false),
+        GROPU_OPEN(5, false),
+        GROUP_CLOSE(5, false),
+        STAR(4, true),
+        PLUS(4, true),
+        REPEAT(4, true),
+        CONCAT(3, true),
+        OR(2, true),
         PRONGN(1, true),
         END(0, false),
         CHAR(0, false),
