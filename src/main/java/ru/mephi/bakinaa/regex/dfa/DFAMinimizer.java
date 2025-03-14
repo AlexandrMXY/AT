@@ -1,5 +1,6 @@
 package ru.mephi.bakinaa.regex.dfa;
 
+import ru.mephi.bakinaa.IOUtils;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
 
 import java.util.*;
@@ -91,16 +92,17 @@ public class DFAMinimizer {
             }
         }
 
-        System.out.println("\nComponents");
-        System.out.println(Arrays.toString(components));
+        IOUtils.println("\nComponents");
+        IOUtils.println(Arrays.toString(components));
 
-        System.out.println("\nMarked");
-        for (int i = 0; i < statesCnt; i++) {
-            for (int j = 0; j < statesCnt; j++) {
-                System.out.print(isMarked(i, j) ? '1' : '0');
+        IOUtils.println("\nMarked");
+        if (IOUtils.isPrint())
+            for (int i = 0; i < statesCnt; i++) {
+                for (int j = 0; j < statesCnt; j++) {
+                    IOUtils.print(isMarked(i, j) ? '1' : '0');
+                }
+                IOUtils.println();
             }
-            System.out.println();
-        }
 
         return buildDFA(components, nextComponentIndex - 1);
     }

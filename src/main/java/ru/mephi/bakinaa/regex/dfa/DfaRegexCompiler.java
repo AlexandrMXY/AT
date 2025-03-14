@@ -1,6 +1,6 @@
 package ru.mephi.bakinaa.regex.dfa;
 
-import ru.mephi.bakinaa.GVUtils;
+import ru.mephi.bakinaa.IOUtils;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
 import ru.mephi.bakinaa.regex.tree.TreeNode;
 
@@ -24,21 +24,23 @@ public class DfaRegexCompiler {
     }
 
     public DfaRegEx compile() {
-        System.out.println("Compiling DFA");
+        IOUtils.println("Compiling DFA");
         lastIndex = symbolsTable.getLastTreeIndex();
         root.calcPos();
         followPos = FollowPos.forTree(root, lastIndex);
 
-        GVUtils.saveTree(root, "2.png", GVUtils::datalizedNodeLabel);
-        System.out.println("\nfollowpos");
-        for (int i = 0; i < lastIndex; i++)
-            System.out.printf("%d %s\n", i, followPos.get(i).toString());
+        IOUtils.saveTree(root, "2.png", IOUtils::datalizedNodeLabel);
+        IOUtils.println("\nfollowpos");
+        if (IOUtils.isPrint()) {
+            for (int i = 0; i < lastIndex; i++)
+                IOUtils.printf("%d %s\n", i, followPos.get(i).toString());
+        }
 
         buildDFA();
-        GVUtils.saveDFA(dfa, states, "3.png");
+        IOUtils.saveDFA(dfa, states, "3.png");
 
         minimizeDFA();
-        GVUtils.saveDFA(dfa, "4.png");
+        IOUtils.saveDFA(dfa, "4.png");
 
         return new DfaRegEx(symbolsTable, dfa);
     }

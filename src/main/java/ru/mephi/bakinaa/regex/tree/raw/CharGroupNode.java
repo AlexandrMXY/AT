@@ -22,8 +22,7 @@ public class CharGroupNode extends RawNode {
         Set<Integer> uniqe = new HashSet<>();
 
         for (CharGroup g : groups)
-            for (char c : g)
-                uniqe.add(context.symbolsTable.idOf(c));
+            uniqe.addAll(context.symbolsTable.getIdsOf(g));
 
         return uniqe.stream()
                 .map((id) -> (TreeNode) new Char(context.symbolsTable.nextTreeIndex(id)))

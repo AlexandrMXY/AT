@@ -71,6 +71,24 @@ public class AdvancedRegExElementsTest {
     }
 
     @Test
+    public void captures_repeatOnCaptureGroup_shouldThorw() {
+        assertThrows(RegExException.class, () ->
+                RegEx.compile("#(a){1,2}"));
+    }
+
+    @Test
+    public void captures_plusOnCaptureGroup_shouldThorw() {
+        assertThrows(RegExException.class, () ->
+                RegEx.compile("#(a)+"));
+    }
+
+    @Test
+    public void captures_starCaptureGroup_shouldThorw() {
+        assertThrows(RegExException.class, () ->
+                RegEx.compile("#(a)*"));
+    }
+
+    @Test
     public void backreference_validBackreference_shouldMatchesCorrectly() {
         RegEx regex = RegEx.compile("#([a-z]*)f#0");
         assertTrue(regex.matcher("afa").matches());

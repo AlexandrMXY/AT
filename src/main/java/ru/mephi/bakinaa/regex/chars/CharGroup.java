@@ -1,7 +1,6 @@
 package ru.mephi.bakinaa.regex.chars;
 
 import lombok.NonNull;
-import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -118,16 +117,16 @@ public record CharGroup  (
     }
 
     private class Iter implements Iterator<Character> {
-        char cur = from;
+        char next = from;
 
         @Override
         public boolean hasNext() {
-            return cur < to;
+            return next <= to;
         }
 
         @Override
         public Character next() {
-            return cur++;
+            return next++;
         }
     }
 }

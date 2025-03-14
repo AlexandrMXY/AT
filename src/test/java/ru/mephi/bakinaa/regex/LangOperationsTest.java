@@ -62,6 +62,22 @@ public class LangOperationsTest {
 
     @ParameterizedTest
     @MethodSource("datasource1Arg")
+    public void nfaMatcherTest(RegExTestData data) {
+        RegEx regex = RegEx.compile(data.regex, true);
+        for (var str : data.valid) {
+            assertThat(regex.matcher(str).matches())
+                    .as("Check that \"%s\" matches NFA RE %s", str, data.regex)
+                    .isTrue();
+        }
+        for (var str : data.invalid) {
+            assertThat(regex.matcher(str).matches())
+                    .as("Check that \"%s\" doesnt matches NFA RE %s", str, data.regex)
+                    .isFalse();
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("datasource1Arg")
     public void inverseTest(RegExTestData data) {
         RegEx regex = RegEx.compile(data.regex);
         RegEx inverse = regex.inversion();

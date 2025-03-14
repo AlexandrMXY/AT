@@ -12,7 +12,7 @@ public class Capture extends TreeNode {
 
     @Override
     public TreeNode copy() {
-        throw new RegExException("Unnable to use *, +, or {,} with an expression that includes a capture group");
+        throw new RegExException("Unnable to use + or {,} with an expression that includes a capture group");
     }
 
     @Override

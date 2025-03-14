@@ -1,14 +1,10 @@
 package ru.mephi.bakinaa.regex.dfa;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.mephi.bakinaa.GVUtils;
+import ru.mephi.bakinaa.IOUtils;
 import ru.mephi.bakinaa.regex.RegEx;
 import ru.mephi.bakinaa.regex.chars.CharGroup;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
-import ru.mephi.bakinaa.regex.dfa.DFAState;
-import ru.mephi.bakinaa.regex.dfa.DfaRegExMatcher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,24 +82,6 @@ public class DfaRegEx implements RegEx {
                         sb.append('|');
                     sb.append(ij);
 
-//                    if (kk.length() == 1 && kk.charAt(0) == '$')
-//                        kk.setLength(0);
-//
-//                    if (i == k) {
-//                        sb.append(kk);
-//                        if (j != k)
-//                            sb.append(kk).append(kj);
-//                    }
-//                    else if (j == k)
-//                        sb.append(ik).append(kk);
-//
-//                    else {
-//                        if (!ij.isEmpty())
-//                            sb.append(ij).append('|').append(ik).append(kk).append(kj);
-//                        else
-//                            sb.append(ik).append(kk).append(kj);
-//                    }
-
                     if (!sb.isEmpty())
                         sb.insert(0, '(').append(')');
                 }
@@ -179,14 +157,15 @@ public class DfaRegEx implements RegEx {
             }
         }
 
-        System.out.println("\nSub sym table");
-        for (CharGroup g : resSt.getGroups())
-            System.out.printf("%s ", g.toString());
+        IOUtils.println("\nSub sym table");
+        if (IOUtils.isPrint())
+            for (CharGroup g : resSt.getGroups())
+                IOUtils.printf("%s ", g.toString());
 
 
-        GVUtils.saveDFA(result, "sub0.png");
+        IOUtils.saveDFA(result, "sub0.png");
         result = new DFAMinimizer(result, resSt, reachable).minimize();
-        GVUtils.saveDFA(result, "sub1.png");
+        IOUtils.saveDFA(result, "sub1.png");
         return new DfaRegEx(resSt, result);
     }
 

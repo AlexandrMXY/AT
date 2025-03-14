@@ -91,6 +91,19 @@ class BasicRegExElementsTest {
     }
 
     @Test
+    public void operatrions_charGroups3() {
+        RegEx reg = RegEx.compile("[a-cx-z][%%-%-%]]*");
+
+        assertTrue(reg.matcher("a%").matches());
+        assertTrue(reg.matcher("b-").matches());
+        assertTrue(reg.matcher("y%-%").matches());
+        assertTrue(reg.matcher("y]]").matches());
+        assertFalse(reg.matcher("h%").matches());
+        assertFalse(reg.matcher("").matches());
+        assertFalse(reg.matcher("%").matches());
+    }
+
+    @Test
     public void operatrions_empty() {
         RegEx reg = RegEx.compile("$");
 

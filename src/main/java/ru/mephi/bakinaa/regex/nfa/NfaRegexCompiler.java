@@ -1,8 +1,6 @@
 package ru.mephi.bakinaa.regex.nfa;
 
-import ru.mephi.bakinaa.GVUtils;
-import ru.mephi.bakinaa.regex.RegEx;
-import ru.mephi.bakinaa.regex.dfa.DfaRegEx;
+import ru.mephi.bakinaa.IOUtils;
 import ru.mephi.bakinaa.regex.RegExCompiler;
 import ru.mephi.bakinaa.regex.RegExException;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
@@ -23,13 +21,13 @@ public class NfaRegexCompiler implements RegExCompiler {
 
     @Override
     public NfaRegEx compile() {
-        System.out.println("Compiling NFA");
+        IOUtils.println("Compiling NFA");
 
         StatesPair sp = treeIteration(root);
         nfa.setInitialStateId(sp.initialState());
         nfa.setFinalStateId(sp.finalState());
 
-        GVUtils.saveNFA(nfa, "2.png");
+        IOUtils.saveNFA(nfa, "2.png");
 
         return new NfaRegEx(nfa, symbolsTable);
     }
@@ -65,6 +63,10 @@ public class NfaRegexCompiler implements RegExCompiler {
             case Char c -> {
                 result = new StatesPair(nfa.addNode(), nfa.addNode());
                 nfa.addTransition(result.initialState(), result.finalState(), symbolsTable.getCharIdOfTreeIndex(c.pos));
+            }
+            case EpsChar e -> {
+                int newNodeId = nfa.addNode();
+                result = new StatesPair(newNodeId, newNodeId);
             }
             case Capture c -> {
                 result = new StatesPair(nfa.addNode(), nfa.addNode());

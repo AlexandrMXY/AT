@@ -33,8 +33,6 @@ public class DFA {
     }
 
     public void addTransition(int from, int to, int charId) {
-        if (to == -1)
-            throw new IndexOutOfBoundsException();
         transitions.get(from).put(charId, to);
     }
 

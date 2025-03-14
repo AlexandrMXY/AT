@@ -7,28 +7,72 @@ import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import ru.mephi.bakinaa.regex.dfa.DFA;
-import ru.mephi.bakinaa.regex.dfa.DFAState;
 import ru.mephi.bakinaa.regex.nfa.NFA;
 import ru.mephi.bakinaa.regex.nfa.NFATransition;
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.*;
 
 import java.io.File;
+import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static guru.nidi.graphviz.model.Factory.*;
 
-public class GVUtils {
+public class IOUtils {
+    @Getter @Setter
+    private static boolean print = false;
+    @Getter @Setter
+    private static boolean saveGraphs = false;
+
+    private static final PrintStream printStream = System.out;
+
+    public static void print(String s) {
+        if (!print)
+            return;
+        printStream.print(s);
+    }
+    public static void print(Object s) {
+        if (!print)
+            return;
+        printStream.print(s);
+    }
+    public static void println(String s) {
+        if (!print)
+            return;
+        printStream.println(s);
+    }
+    public static void println(Object s) {
+        if (!print)
+            return;
+        printStream.println(s);
+    }
+    public static void println() {
+        if (!print)
+            return;
+        printStream.println();
+    }
+    public static void printf(String s, Object... args) {
+        if (!print)
+            return;
+        printStream.printf(s, args);
+    }
+
+
+
     public static void saveTree(TreeNode root, String file) {
-        saveTree(root, file, GVUtils::defaultNodeLabel);
+        saveTree(root, file, IOUtils::defaultNodeLabel);
     }
 
     @SneakyThrows
     public static void saveTree(TreeNode root, String file, Function<TreeNode, String> label) {
+        if (!saveGraphs)
+            return;
         MutableGraph g = mutGraph("tree");
         treeIter(g, root, label);
         Graphviz gv = Graphviz.fromGraph(g);
@@ -72,30 +116,9 @@ public class GVUtils {
     }
 
     @SneakyThrows
-    public static void saveDFA(DFAState iState, Map<Set<Integer>, DFAState> stateMap, String file) {
-        MutableGraph g = mutGraph("dfa").setDirected(true);
-
-        stateMap.forEach((k, fromState) -> {
-            g.add(mutNode(String.valueOf(System.identityHashCode(fromState))).add(Label.of(k.toString())));
-
-            fromState.transitions.forEach((charId, targetState) -> {
-                g.add(mutNode(String.valueOf(System.identityHashCode(fromState))).addLink(
-                        to(mutNode(String.valueOf(System.identityHashCode(targetState))))
-                                .with(Label.of(String.valueOf(charId)))
-                ));
-            });
-
-            if (fromState.isFinal)
-                g.add(mutNode(String.valueOf(System.identityHashCode(fromState))).add(Shape.DOUBLE_CIRCLE));
-        });
-
-        g.add(mutNode(String.valueOf(System.identityHashCode(iState))).add(Color.GREEN));
-
-        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
-    }
-
-    @SneakyThrows
     public static void saveDFA(DFA dfa, String file) {
+        if (!saveGraphs)
+            return;
         MutableGraph g = mutGraph("dfa").setDirected(true);
 
         MutableNode[] nodes = new MutableNode[dfa.getStates()];
@@ -121,6 +144,8 @@ public class GVUtils {
 
     @SneakyThrows
     public static void saveDFA(DFA dfa, Map<Set<Integer>, Integer> names, String file) {
+        if (!saveGraphs)
+            return;
         MutableGraph g = mutGraph("dfa").setDirected(true);
 
         MutableNode[] nodes = new MutableNode[dfa.getStates()];
@@ -148,38 +173,9 @@ public class GVUtils {
     }
 
     @SneakyThrows
-    public static void saveDFA(DFAState iState, String file) {
-        MutableGraph g = mutGraph("dfa").setDirected(true);
-        Set<Integer> visited = new HashSet<>();
-
-        iterateDFA(g, iState, visited);
-
-        g.add(mutNode(String.valueOf(iState.index)).add(Color.GREEN));
-
-        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
-    }
-
-    private static void iterateDFA(MutableGraph g, DFAState state, Set<Integer> visited) {
-        if (visited.contains(state.index))
-            return;
-        visited.add(state.index);
-
-        state.transitions.forEach((charId, targetState) -> {
-            g.add(
-                    mutNode(String.valueOf(state.index)).addLink(
-                            to(mutNode(String.valueOf(targetState.index)))
-                                    .with(Label.of(String.valueOf(charId)))
-                    )
-            );
-            iterateDFA(g, targetState, visited);
-        });
-
-        if (state.isFinal)
-            g.add(mutNode(String.valueOf(state.index)).add(Shape.DOUBLE_CIRCLE));
-    }
-
-    @SneakyThrows
     public static void saveNFA(NFA nfa, String file) {
+        if (!saveGraphs)
+            return;
         MutableGraph g = mutGraph("nfa").setDirected(true);
 
         MutableNode[] nodes = new MutableNode[nfa.getStates()];

@@ -1,10 +1,12 @@
 package ru.mephi.bakinaa;
 
 import ru.mephi.bakinaa.regex.RegEx;
-import ru.mephi.bakinaa.regex.nfa.NfaRegExMatcher;
 
 public class Main {
     public static void main(String[] args) {
+        IOUtils.setPrint(true);
+        IOUtils.setSaveGraphs(true);
+
 
 //        RegEx regex = RegEx.compile("#((a|b)*)f*#((a|b)*)#0", true);
 //        var matcher = regex.matcher("abaabafbaabbbabaaba");//

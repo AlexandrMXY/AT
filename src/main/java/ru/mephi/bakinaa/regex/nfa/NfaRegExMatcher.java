@@ -1,5 +1,6 @@
 package ru.mephi.bakinaa.regex.nfa;
 
+import ru.mephi.bakinaa.IOUtils;
 import ru.mephi.bakinaa.regex.RegExMatcher;
 import ru.mephi.bakinaa.regex.chars.SymbolsTable;
 
@@ -73,12 +74,9 @@ public class NfaRegExMatcher implements RegExMatcher {
         transitionsIds.push(trId);
         transitionsIds.push(0);
 
-        if (states.toString().equals("[8, 0, 1, 2, 3, 4, 5, 6, 7, 9, 18, 10, 11, 12, 13, 14, 15, 16, 17, 19, 20]"))
-            System.out.println("Here");
-
-        System.out.println(states);
-        System.out.println(captureBuffer);
-        System.out.println(str.getIndex() + " " + getCaptures());
+        IOUtils.println(states);
+        IOUtils.println(captureBuffer);
+        IOUtils.println(str.getIndex() + " " + getCaptures());
     }
 
     private void backstep() {
