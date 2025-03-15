@@ -99,7 +99,7 @@ public class SymbolsTable implements Iterable<Integer> {
 
     public String charAsString(int charId) {
         if (charId == 0)
-            return "";
+            return "$";
         CharGroup g = groups.get(charId - 1);
         if (g.from() == g.to())
             return String.valueOf(g.from());

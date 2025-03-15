@@ -7,6 +7,8 @@ public class Main {
         IOUtils.setPrint(true);
         IOUtils.setSaveGraphs(true);
 
+        System.out.println(RegEx.compile("a*b*c*", true).restore());
+
 
 //        RegEx regex = RegEx.compile("#((a|b)*)f*#((a|b)*)#0", true);
 //        var matcher = regex.matcher("abaabafbaabbbabaaba");//
@@ -27,7 +29,7 @@ public class Main {
 //        System.out.println(inv.matcher("cbba").matches());
 //        System.out.println(inv.restore());
 
-        System.out.println(RegEx.compile("abc/a|b)").matcher("abca").matches());
+//        System.out.println(RegEx.compile("abc(a|b)").matcher("abca").matches());
 
 //        System.out.println(((NfaRegExMatcher)matcher).getCaptures());
         // a*b

@@ -1,21 +1,23 @@
 package ru.mephi.bakinaa.regex;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.platform.commons.util.CollectionUtils;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
-public class LangOperationsTest {
-    private static final List<RegExTestData> data = List.of(
+@RequiredArgsConstructor
+public abstract class AbstractLangOperationsTest {
+    @Getter private final boolean nfa;
+
+    public static final List<RegExTestData> data = List.of(
             new RegExTestData("ab*c",
                     List.of("ac", "abc", "abbbbbc"),
                     List.of("", "aqc", "ab", "bc", "aabc")),
@@ -47,31 +49,15 @@ public class LangOperationsTest {
     @ParameterizedTest
     @MethodSource("datasource1Arg")
     public void matcherTest(RegExTestData data) {
-        RegEx regex = RegEx.compile(data.regex);
+        RegEx regex = RegEx.compile(data.regex, nfa);
         for (var str : data.valid) {
             assertThat(regex.matcher(str).matches())
-                    .as("Check that \"%s\" matches RE %s", str, data.regex)
+                    .as("Check that \"%s\" matches RE %s [NFA = %s]", str, data.regex, nfa)
                     .isTrue();
         }
         for (var str : data.invalid) {
             assertThat(regex.matcher(str).matches())
-                    .as("Check that \"%s\" doesnt matches RE %s", str, data.regex)
-                    .isFalse();
-        }
-    }
-
-    @ParameterizedTest
-    @MethodSource("datasource1Arg")
-    public void nfaMatcherTest(RegExTestData data) {
-        RegEx regex = RegEx.compile(data.regex, true);
-        for (var str : data.valid) {
-            assertThat(regex.matcher(str).matches())
-                    .as("Check that \"%s\" matches NFA RE %s", str, data.regex)
-                    .isTrue();
-        }
-        for (var str : data.invalid) {
-            assertThat(regex.matcher(str).matches())
-                    .as("Check that \"%s\" doesnt matches NFA RE %s", str, data.regex)
+                    .as("Check that \"%s\" doesnt matches RE %s [NFA = %s]", str, data.regex, nfa)
                     .isFalse();
         }
     }
@@ -79,17 +65,17 @@ public class LangOperationsTest {
     @ParameterizedTest
     @MethodSource("datasource1Arg")
     public void inverseTest(RegExTestData data) {
-        RegEx regex = RegEx.compile(data.regex);
+        RegEx regex = RegEx.compile(data.regex, nfa);
         RegEx inverse = regex.inversion();
 
         for (var str : data.valid) {
             assertThat(inverse.matcher(reverse(str)).matches())
-                    .as("Check that \"%s\" matches inverse of RE %s", reverse(str), data.regex)
+                    .as("Check that \"%s\" matches inverse of RE %s [NFA = %s]", reverse(str), data.regex, nfa)
                     .isEqualTo(regex.matcher(str).matches());
         }
         for (var str : data.invalid) {
             assertThat(inverse.matcher(reverse(str)).matches())
-                    .as("Check that \"%s\" matches inverse of RE %s", reverse(str), data.regex)
+                    .as("Check that \"%s\" matches inverse of RE %s [NFA = %s]", reverse(str), data.regex, nfa)
                     .isEqualTo(regex.matcher(str).matches());
         }
     }
@@ -97,27 +83,28 @@ public class LangOperationsTest {
     @ParameterizedTest
     @MethodSource("datasource1Arg")
     public void restoreTest(RegExTestData data) {
-        RegEx regex = RegEx.compile(data.regex);
+        RegEx regex = RegEx.compile(data.regex, nfa);
         String restoredRE = regex.restore();
-        RegEx restored = RegEx.compile(restoredRE);
+        RegEx restored = RegEx.compile(restoredRE, nfa);
 
         for (var str : data.valid) {
             assertThat(restored.matcher(str).matches())
-                    .as("Check that \"%s\" matches restored RE for RE %s [restored = %s]", str, data.regex, restoredRE)
+                    .as("Check that \"%s\" matches restored RE for RE %s [restored = %s] [NFA = %s]", str, data.regex, restoredRE, nfa)
                     .isEqualTo(regex.matcher(str).matches());
         }
         for (var str : data.invalid) {
             assertThat(restored.matcher(str).matches())
-                    .as("Check that \"%s\" matches restored RE for RE %s [restored = %s]", str, data.regex, restoredRE)
+                    .as("Check that \"%s\" matches restored RE for RE %s [restored = %s] [NFA = %s]", str, data.regex, restoredRE, nfa)
                     .isEqualTo(regex.matcher(str).matches());
         }
     }
 
     @ParameterizedTest
     @MethodSource("datasource2Arg")
+    @EnabledIf("enableSubTest")
     public void subtractTest(RegExTestData arg1, RegExTestData arg2) {
-        RegEx re1 = RegEx.compile(arg1.regex);
-        RegEx re2 = RegEx.compile(arg2.regex);
+        RegEx re1 = RegEx.compile(arg1.regex, nfa);
+        RegEx re2 = RegEx.compile(arg2.regex, nfa);
         RegEx sub = re1.subtract(re2);
 
         Stream.concat(Stream.concat(
@@ -125,7 +112,7 @@ public class LangOperationsTest {
                 Stream.concat(arg2.valid.stream(), arg2.invalid.stream()))
                 .forEach((str) -> {
                     assertThat(sub.matcher(str).matches())
-                            .as("Check that \"%s\" matches sub of RE %s and RE %s")
+                            .as("Check that \"%s\" matches sub of RE %s and RE %s [NFA = %s]", str, arg1.regex, arg2.regex, nfa)
                             .isEqualTo(
                                     re1.matcher(str).matches() && !re2.matcher(str).matches());
                 });

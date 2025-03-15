@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import ru.mephi.bakinaa.regex.dfa.DFA;
 import ru.mephi.bakinaa.regex.nfa.NFA;
 import ru.mephi.bakinaa.regex.nfa.NFATransition;
+import ru.mephi.bakinaa.regex.nfa.NfaRegEx;
 import ru.mephi.bakinaa.regex.tree.*;
 import ru.mephi.bakinaa.regex.tree.raw.*;
 
@@ -209,6 +210,40 @@ public class IOUtils {
 
                 nodes[finalFrom].addLink(to(nodes[transition.getTarget()]).with(label));
             });
+        }
+
+        Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
+    }
+
+    @SneakyThrows
+    public static void saveNFA(List<NfaRegEx.NFANode> nodes, String file) {
+        if (!saveGraphs)
+            return;
+
+        MutableGraph g = mutGraph("nfa").setDirected(true);
+
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i).eliminated)
+                continue;
+            g.add(mutNode(String.valueOf(System.identityHashCode(nodes.get(i)))).add(Label.of(String.valueOf(i))));
+            for (var tr : nodes.get(i).outcoming) {
+                if (tr.target.eliminated || tr.source.eliminated)
+                    continue;
+                g.add(mutNode(String.valueOf(System.identityHashCode(tr.source))).addLink(
+                        to(mutNode(String.valueOf(System.identityHashCode(tr.target)))).with(Label.of(tr.label))));
+            }
+            for (var tr : nodes.get(i).incomping) {
+                if (tr.target.eliminated || tr.source.eliminated)
+                    continue;
+                g.add(mutNode(String.valueOf(System.identityHashCode(tr.source))).addLink(
+                        to(mutNode(String.valueOf(System.identityHashCode(tr.target)))).with(Label.of(tr.label))));
+            }
+            for (var tr : nodes.get(i).self) {
+                if (tr.target.eliminated || tr.source.eliminated)
+                    continue;
+                g.add(mutNode(String.valueOf(System.identityHashCode(tr.source))).addLink(
+                        to(mutNode(String.valueOf(System.identityHashCode(tr.target)))).with(Label.of(tr.label))));
+            }
         }
 
         Graphviz.fromGraph(g).render(Format.PNG).toFile(new File(file));
