@@ -1,0 +1,15 @@
+
+spring:
+  profiles:
+    default: prod
+  application:
+    name: TheDB
+
+#logging:
+#  structured:
+#    format:
+#      console: ecs
+
+server:
+  port: 8080
+
