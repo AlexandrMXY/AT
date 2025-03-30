@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.lang;
+package ru.mephi.bakinaa.lab3.lang.enums;
 
 public enum ComparisonMode {
     LESS,

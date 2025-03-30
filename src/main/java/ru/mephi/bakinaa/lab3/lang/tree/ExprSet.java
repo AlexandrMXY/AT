@@ -1,8 +1,11 @@
 package ru.mephi.bakinaa.lab3.lang.tree;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class ExprSet extends TreeNode {
     private List<TreeNode> exprs = new ArrayList<>();
 

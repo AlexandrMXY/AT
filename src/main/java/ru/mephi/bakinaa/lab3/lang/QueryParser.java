@@ -3,11 +3,10 @@ package ru.mephi.bakinaa.lab3.lang;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
+import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
+import ru.mephi.bakinaa.lab3.utils.GVUtils;
 
-import java.io.IOException;
 import java.io.StringReader;
-
-import static ru.mephi.bakinaa.lab3.lang.TokenType.PAR_OPEN;
 
 @Slf4j
 public class QueryParser {
@@ -20,13 +19,16 @@ public class QueryParser {
         parser.parser = this;
     }
 
-    public void parse() {
-        parser.yyparse();
-        var res = parser.yyval;
-        System.out.println(res);
-    }
-
-    private void consumeToken(Token token) {
+    public TreeNode parse() {
+        try {
+            parser.yyparse();
+            var res = (TreeNode) parser.yyval.obj;
+            System.out.println(res);
+            return res;
+        } catch (LangException e) {
+            GVUtils.save((TreeNode) parser.yyval.obj, "e.png");
+            throw e;
+        }
     }
 
     @SneakyThrows
@@ -59,6 +61,14 @@ public class QueryParser {
             case NULL -> YYParser.NULL;
             case IDENTIFIER -> YYParser.ID;
 
+            case INDEX_TYPE -> YYParser.INDEX_TYPE;
+            case TYPE_NAME -> YYParser.TYPE_NAME;
+            case MODIFIER -> YYParser.MODIFIER;
+            case CONSTRAINT -> YYParser.CONSTRAINT;
+
+            case RELATIONSHIP -> YYParser.RELATIONSHIP;
+            case ROW -> YYParser.ROW;
+
             case PAR_OPEN -> YYParser.PAR_OPEN;
             case PAR_CLOSE -> YYParser.PAR_CLOSE;
             case SQUARE_BR_OPEN -> YYParser.SQUARE_BR_OPEN;
@@ -70,6 +80,7 @@ public class QueryParser {
             case DOT -> YYParser.DOT;
             case SEMICOLON -> YYParser.SEMICOLON;
             case SCOPE_OPERATOR -> YYParser.SCOPE_OPERATOR;
+            case ARROW -> YYParser.ARROW;
 
             case EQUALS -> YYParser.EQUALS;
             case NOT_EQUALS -> YYParser.NOT_EQUALS;

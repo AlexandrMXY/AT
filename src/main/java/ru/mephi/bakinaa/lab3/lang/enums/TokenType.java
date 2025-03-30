@@ -1,4 +1,6 @@
-package ru.mephi.bakinaa.lab3.lang;
+package ru.mephi.bakinaa.lab3.lang.enums;
+
+import ru.mephi.bakinaa.lab3.lang.Token;
 
 public enum TokenType {
     INT_NUM,
@@ -8,6 +10,14 @@ public enum TokenType {
     FALSE,
     NULL,
     IDENTIFIER,
+
+    INDEX_TYPE,
+    TYPE_NAME,
+    MODIFIER,
+    CONSTRAINT,
+
+    RELATIONSHIP,
+    ROW,
 
     PAR_OPEN,
     PAR_CLOSE,
@@ -20,6 +30,7 @@ public enum TokenType {
     DOT,
     SEMICOLON,
     SCOPE_OPERATOR,
+    ARROW,
 
     EQUALS,
     NOT_EQUALS,
