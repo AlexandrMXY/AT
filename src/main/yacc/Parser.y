@@ -68,7 +68,7 @@ exprs: expr             { $$ = $1; }
     | exprs COMA exprs  { $$ = new YYParserVal(ExprSet.combine((TreeNode)$1.obj, (TreeNode)$3.obj)); }
 
 id: ID { $$ = new YYParserVal(new Id($1.sval)); }
-    | ID SCOPE_OPERATOR ID { $$ = new YYParserVal(new ScopedId($1.sval, $3.sval)); }
+    | ID SCOPE_OPERATOR ID { $$ = new YYParserVal(new Id($1.sval, $3.sval)); }
 
 rowDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, $2.sval)); }
     | MODIFIER rowDef { ((ColDefinition)$2.obj).addModifier(Modifier.parse($1.sval)); $$ = $2; }

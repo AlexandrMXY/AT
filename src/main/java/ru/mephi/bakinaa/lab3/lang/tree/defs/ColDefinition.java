@@ -7,7 +7,6 @@ import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.lang.enums.Types;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.ScopedId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,7 @@ public class ColDefinition extends TreeNode {
 
     public ColDefinition(Types type, Id name) {
         this.type = type;
-        if (name instanceof ScopedId)
+        if (name.scope != null)
             throw new LangException("Illegal col name");
         this.name = name.value;
     }
