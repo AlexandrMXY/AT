@@ -15,16 +15,18 @@ import java.util.List;
 @AllArgsConstructor
 public class TableDefinition extends TreeNode {
     private IndexType indexType;
-    private List<ColDefinition> rows = new ArrayList<>();
+    private List<ColDefinition> cols = new ArrayList<>();
     private List<ConstraintDefinition> constraints = new ArrayList<>();
     private Id id;
 
     public TableDefinition(IndexType index, Statements statements, Id id) {
+        if (id.scope != null)
+            throw new LangException("Illegal table id " + id.toString());
         this.indexType = index;
         this.id = id;
         for (TreeNode node : statements.getStatements()) {
             if (node instanceof ColDefinition row)
-                rows.add(row);
+                cols.add(row);
             else if (node instanceof ConstraintDefinition constraint)
                 constraints.add(constraint);
             else
@@ -38,7 +40,7 @@ public class TableDefinition extends TreeNode {
 
     public List<TreeNode> getAllRowsAndConstraints() {
         List<TreeNode> res = new ArrayList<>();
-        res.addAll(rows);
+        res.addAll(cols);
         res.addAll(constraints);
         return res;
     }

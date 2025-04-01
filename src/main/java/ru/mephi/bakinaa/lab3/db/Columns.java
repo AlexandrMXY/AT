@@ -7,10 +7,11 @@ import java.util.Map;
 
 public class Columns {
     private Map<String, Column> columns = new HashMap<>();
+    private Map<Integer, Column> columnIndexesMap = new HashMap<>();
 
     public int registerColumn(Column column) {
         if (columns.containsKey(column.getName()))
-            throw new InvalidDBAccessException("Column with given name already exists");
+            throw new InvalidDBAccessException("Column with name " + column.getName() + " already exists");
 
         int index = columns.values()
                 .stream()
@@ -20,12 +21,15 @@ public class Columns {
         column.setIndex(index);
 
         columns.put(column.getName(), column);
+        columnIndexesMap.put(index, column);
 
         return index;
     }
 
     public int getIndex(String columnName) {
-        return columns.get(columnName).getIndex();
+        if (columns.containsKey(columnName))
+            return columns.get(columnName).getIndex();
+        return -1;
     }
 
     public Column getColumn(String columnName) {
@@ -34,5 +38,27 @@ public class Columns {
 
     public Map<String, Column> getColumnsMap() {
         return columns;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        columns.forEach((name, col) -> {
+            builder.append(name).append(" ").append(col.getIndex());
+            if (!col.isNullable())
+                builder.append(" notnull");
+            if (col.isPrimary())
+                builder.append(" primary");
+            if (col.isUnique())
+                builder.append(" unique");
+            builder.append("\n");
+        });
+
+        return builder.toString();
+    }
+
+    public Column getColumn(int index) {
+        return columnIndexesMap.get(index);
     }
 }

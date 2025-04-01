@@ -1,5 +1,6 @@
 package ru.mephi.bakinaa.lab3.db.constrints;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.Row;
 import ru.mephi.bakinaa.lab3.db.Table;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Getter
 public class ForeignKeyConstraint extends Constraint {
     private final Table fromTable;
     private final int fromCol;

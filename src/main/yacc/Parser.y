@@ -70,7 +70,7 @@ exprs: expr             { $$ = $1; }
 id: ID { $$ = new YYParserVal(new Id($1.sval)); }
     | ID SCOPE_OPERATOR ID { $$ = new YYParserVal(new Id($1.sval, $3.sval)); }
 
-rowDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, $2.sval)); }
+rowDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, (Id)$2.obj)); }
     | MODIFIER rowDef { ((ColDefinition)$2.obj).addModifier(Modifier.parse($1.sval)); $$ = $2; }
 
 constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (ExprSet)$3.obj)); }

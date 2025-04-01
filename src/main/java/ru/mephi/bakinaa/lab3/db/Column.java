@@ -9,13 +9,12 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Column {
     private String name;
-    private int index;
+    private int index = -1;
     private boolean nullable = true;
     private boolean primary = false;
     private boolean unique = false;
 
-    public Column(String name, int index) {
+    public Column(String name) {
         this.name = name;
-        this.index = index;
     }
 }

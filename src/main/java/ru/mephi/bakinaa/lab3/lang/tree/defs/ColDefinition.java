@@ -25,12 +25,21 @@ public class ColDefinition extends TreeNode {
         this.name = name.value;
     }
 
+    public ColDefinition(String type, Id name) {
+        this.type = Types.parse(type);
+        if (name.scope != null)
+            throw new LangException("Illegal col name");
+        this.name = name.value;
+    }
+
     public ColDefinition(String type, String name) {
         this.type = Types.parse(type);
         this.name = name;
     }
 
     public void addModifier(Modifier m) {
+        if (modifiers.contains(m))
+            throw new LangException("Multiple " + m + " modifiers");
         modifiers.add(m);
     }
 }

@@ -1,5 +1,6 @@
 package ru.mephi.bakinaa.lab3.db.constrints;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.Row;
 import ru.mephi.bakinaa.lab3.db.Table;
@@ -10,6 +11,7 @@ import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Getter
 @RequiredArgsConstructor
 public class UniqueConstraint extends Constraint {
     private static final Map<Integer, Obj> EMPTY = Collections.unmodifiableMap(new HashMap<>());

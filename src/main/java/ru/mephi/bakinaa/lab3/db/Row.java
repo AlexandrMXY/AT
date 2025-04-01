@@ -13,7 +13,7 @@ public class Row {
     public Obj get(int index) {
         if (index < 0)
             throw new InvalidDBAccessException();
-        if (index > data.size())
+        if (index >= data.size())
             return null;
         return data.get(index);
     }

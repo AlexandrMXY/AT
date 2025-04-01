@@ -16,6 +16,6 @@ public class Id extends TreeNode {
 
     @Override
     public String toString() {
-        return value;
+        return scope == null ? value : scope + "::" + value;
     }
 }
