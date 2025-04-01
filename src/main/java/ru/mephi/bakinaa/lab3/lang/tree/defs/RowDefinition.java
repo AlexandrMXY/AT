@@ -5,14 +5,13 @@ import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.tree.Statements;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 import ru.mephi.bakinaa.lab3.lang.tree.ops.Assign;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.Id;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
-public class RowDefinition extends TreeNode {
+public class RowDefinition implements TreeNode {
     private Map<Id, TreeNode> assigns = new HashMap<>();
 
     public RowDefinition(Statements statements) {

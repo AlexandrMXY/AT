@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class ExprSet extends TreeNode {
+public class ExprSet implements TreeNode {
     private List<TreeNode> exprs = new ArrayList<>();
 
     public ExprSet(TreeNode expr) {

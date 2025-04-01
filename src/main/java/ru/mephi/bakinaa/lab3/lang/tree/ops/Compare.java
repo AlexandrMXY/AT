@@ -7,7 +7,7 @@ import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 
 @AllArgsConstructor
 @Getter
-public class Compare extends TreeNode {
+public class Compare implements TreeNode {
     private ComparisonMode mode;
     private TreeNode left;
     private TreeNode right;

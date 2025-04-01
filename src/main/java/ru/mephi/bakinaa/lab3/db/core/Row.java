@@ -1,6 +1,6 @@
-package ru.mephi.bakinaa.lab3.db;
+package ru.mephi.bakinaa.lab3.db.core;
 
-import ru.mephi.bakinaa.lab3.db.objects.Obj;
+import ru.mephi.bakinaa.lab3.commons.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.ArrayList;
@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class Row {
-    private final List<Obj> data = new ArrayList<>();
+    private final List<SimpleObj> data = new ArrayList<>();
 
-    public Obj get(int index) {
+    public SimpleObj get(int index) {
         if (index < 0)
             throw new InvalidDBAccessException();
         if (index >= data.size())
@@ -18,7 +18,7 @@ public class Row {
         return data.get(index);
     }
 
-    public void set(int index, Obj val) {
+    public void set(int index, SimpleObj val) {
         if (index < 0)
             throw new InvalidDBAccessException();
 
@@ -39,7 +39,7 @@ public class Row {
         return true;
     }
 
-    public static Row withCol(int colId, Obj val) {
+    public static Row withCol(int colId, SimpleObj val) {
         Row res = new Row();
         res.set(colId, val);
         return res;

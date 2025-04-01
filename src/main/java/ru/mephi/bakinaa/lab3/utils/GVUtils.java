@@ -6,6 +6,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 import lombok.SneakyThrows;
+import ru.mephi.bakinaa.lab3.commons.*;
 import ru.mephi.bakinaa.lab3.lang.tree.Statements;
 import ru.mephi.bakinaa.lab3.lang.tree.Dot;
 import ru.mephi.bakinaa.lab3.lang.tree.ExprSet;
@@ -13,7 +14,6 @@ import ru.mephi.bakinaa.lab3.lang.tree.FunCall;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 import ru.mephi.bakinaa.lab3.lang.tree.defs.*;
 import ru.mephi.bakinaa.lab3.lang.tree.ops.*;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.*;
 
 import java.io.File;
 import java.util.Objects;
@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import static guru.nidi.graphviz.model.Factory.*;
 
 public class GVUtils {
+    private static int index = 0;
+
     @SneakyThrows
     public static void save(TreeNode root, String file) {
         MutableGraph g = mutGraph("g").setDirected(true);
@@ -32,8 +34,11 @@ public class GVUtils {
     }
 
     private static MutableNode treeIter(MutableGraph g, TreeNode node) {
-        if (node == null)
-            return null;
+        if (node == null) {
+            MutableNode res = mutNode("$" + index++).setName(Label.of("null"));
+            g.add(res);
+            return res;
+        }
         MutableNode result = mutNode(String.valueOf(System.identityHashCode(node))).add(Label.of(getNodeLabel(node)));
         g.add(result);
 
@@ -83,10 +88,10 @@ public class GVUtils {
             case Dot n -> ".";
 
             case Bool n -> String.valueOf(n.value);
-            case FPNum n -> String.valueOf(n.value);
+            case Real n -> String.valueOf(n.value);
             case Int n -> String.valueOf(n.value);
             case Str n -> "\"" + n.value + "\"";
-            case Null n -> "null";
+            case null -> "null";
             case Id n -> n.toString();
 
             case Statements n -> "STATEMENTS";

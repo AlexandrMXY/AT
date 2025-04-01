@@ -6,11 +6,11 @@ import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.enums.Constraints;
 import ru.mephi.bakinaa.lab3.lang.tree.ExprSet;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.Id;
 
 @AllArgsConstructor
 @Getter
-public class ConstraintDefinition extends TreeNode {
+public class ConstraintDefinition implements TreeNode {
     private Constraints constraint;
     private ExprSet args;
 

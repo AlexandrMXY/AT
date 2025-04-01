@@ -6,14 +6,14 @@ import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.lang.enums.Types;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.Id;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
 @Getter
-public class ColDefinition extends TreeNode {
+public class ColDefinition implements TreeNode {
     private List<Modifier> modifiers = new ArrayList<>();
     private Types type;
     private String name;

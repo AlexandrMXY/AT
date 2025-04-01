@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class Statements extends TreeNode {
+public class Statements implements TreeNode {
     private final List<TreeNode> statements = new ArrayList<>();
 
     public Statements(TreeNode n) {

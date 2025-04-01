@@ -1,9 +1,9 @@
-package ru.mephi.bakinaa.lab3.db;
+package ru.mephi.bakinaa.lab3.db.core;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
-import ru.mephi.bakinaa.lab3.db.objects.Obj;
+import ru.mephi.bakinaa.lab3.commons.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.ArrayList;
@@ -66,7 +66,7 @@ public class Table {
         rows.add(row);
     }
 
-    public void insert(Map<String, Obj> rowData) {
+    public void insert(Map<String, SimpleObj> rowData) {
         Row row = new Row();
         rowData.forEach((col, val) -> {
             int index = columns.getIndex(col);

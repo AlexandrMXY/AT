@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.db.views;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.mephi.bakinaa.lab3.db.Column;
+import ru.mephi.bakinaa.lab3.db.core.Column;
 
 @Getter
 @AllArgsConstructor

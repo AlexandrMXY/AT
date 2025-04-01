@@ -6,7 +6,7 @@ import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 
 @Getter
 @AllArgsConstructor
-public class Or extends TreeNode {
+public class Or implements TreeNode {
     private TreeNode left;
     private TreeNode right;
 }

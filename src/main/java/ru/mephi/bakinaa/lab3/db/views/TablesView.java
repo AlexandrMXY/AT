@@ -1,11 +1,10 @@
 package ru.mephi.bakinaa.lab3.db.views;
 
 import lombok.AllArgsConstructor;
-import ru.mephi.bakinaa.lab3.db.JoinType;
-import ru.mephi.bakinaa.lab3.db.Table;
-import ru.mephi.bakinaa.lab3.db.filters.Condition;
+import ru.mephi.bakinaa.lab3.db.core.Table;
+import ru.mephi.bakinaa.lab3.db.functions.filters.Condition;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.Id;
 
 import java.util.*;
 

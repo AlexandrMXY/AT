@@ -6,6 +6,6 @@ import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 
 @AllArgsConstructor
 @Getter
-public class Not extends TreeNode {
+public class Not implements TreeNode {
     private TreeNode arg;
 }

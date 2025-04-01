@@ -3,11 +3,11 @@ package ru.mephi.bakinaa.lab3.lang.tree;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.Id;
 
 @AllArgsConstructor
 @Getter
-public class Dot extends TreeNode {
+public class Dot implements TreeNode {
     private TreeNode base;
     private Id path;
 

@@ -2,21 +2,20 @@ package ru.mephi.bakinaa.lab3;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ru.mephi.bakinaa.lab3.db.Database;
-import ru.mephi.bakinaa.lab3.db.JoinType;
-import ru.mephi.bakinaa.lab3.db.Table;
-import ru.mephi.bakinaa.lab3.db.filters.Condition;
-import ru.mephi.bakinaa.lab3.db.objects.Int;
-import ru.mephi.bakinaa.lab3.db.objects.Obj;
-import ru.mephi.bakinaa.lab3.db.objects.Str;
+import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.db.views.JoinType;
+import ru.mephi.bakinaa.lab3.db.core.Table;
+import ru.mephi.bakinaa.lab3.db.functions.filters.Condition;
+import ru.mephi.bakinaa.lab3.commons.Int;
+import ru.mephi.bakinaa.lab3.commons.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.Str;
 import ru.mephi.bakinaa.lab3.db.views.RowView;
 import ru.mephi.bakinaa.lab3.db.views.TablesView;
 import ru.mephi.bakinaa.lab3.lang.QueryParser;
 import ru.mephi.bakinaa.lab3.lang.tree.Statements;
 import ru.mephi.bakinaa.lab3.lang.tree.defs.TableDefinition;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.Id;
 import ru.mephi.bakinaa.lab3.utils.GVUtils;
 import ru.mephi.bakinaa.lab3.utils.MapBuilder;
 
@@ -63,7 +62,7 @@ public class Application {
 
         Table A = database.getTable("A");
         for (int i = 0; i < 20; i++) {
-            A.insert(MapBuilder.<String, Obj>builder()
+            A.insert(MapBuilder.<String, SimpleObj>builder()
                     .put("a", new Str("a" + i))
                     .put("b", new Int(i))
                     .put("c", new Str("c" + i))
@@ -71,7 +70,7 @@ public class Application {
         }
         Table B = database.getTable("B");
         for (int i = 0; i < 20; i++) {
-            B.insert(MapBuilder.<String, Obj>builder()
+            B.insert(MapBuilder.<String, SimpleObj>builder()
                     .put("a", new Str("a" + i))
                     .put("b", new Int(-i))
                     .put("c", new Str("c" + i))
@@ -84,7 +83,6 @@ public class Application {
             return Objects.equals(row.get(new Id("A", "a")), (row.get(new Id("B", "a")))) &&
                     ((Int)row.get(new Id("A", "b"))).value % 2 == 0;
         });
-//        tableView.join(B, JoinType.INNER, Condition.TRUE_CONDITION);
 
         RowView row = tableView.first();
         while (row != null) {

@@ -1,8 +1,8 @@
 package ru.mephi.bakinaa.lab3.db.constrints;
 
-import ru.mephi.bakinaa.lab3.db.Row;
-import ru.mephi.bakinaa.lab3.db.Table;
-import ru.mephi.bakinaa.lab3.db.objects.Obj;
+import ru.mephi.bakinaa.lab3.db.core.Row;
+import ru.mephi.bakinaa.lab3.db.core.Table;
+import ru.mephi.bakinaa.lab3.commons.SimpleObj;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class PrimaryKeyConstraint extends UniqueConstraint {
     }
 
     @Override
-    public boolean checkOnModify(Table table, Row row, Map<Integer, Obj> updates) {
+    public boolean checkOnModify(Table table, Row row, Map<Integer, SimpleObj> updates) {
         return checkNonNull(row) && super.checkOnModify(table, row, updates);
     }
 

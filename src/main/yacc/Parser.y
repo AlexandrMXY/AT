@@ -4,8 +4,9 @@
  import ru.mephi.bakinaa.lab3.lang.tree.*;
  import ru.mephi.bakinaa.lab3.lang.tree.ops.*;
  import ru.mephi.bakinaa.lab3.lang.tree.defs.*;
- import ru.mephi.bakinaa.lab3.lang.tree.terms.*;
+ //import ru.mephi.bakinaa.lab3.lang.tree.terms.*;
  import ru.mephi.bakinaa.lab3.lang.enums.*;
+ import ru.mephi.bakinaa.lab3.commons.*;
 %}
 
 %token INT_NUM FLOAT_NUM STRING TRUE FALSE NULL ID
@@ -37,10 +38,10 @@ statementsGroup: CUR_BR_OPEN statement CUR_BR_CLOSE { $$ = $2; }
 
 expr: TRUE      { $$ = new YYParserVal(new Bool(true)); }
     | FALSE     { $$ = new YYParserVal(new Bool(false)); }
-    | INT_NUM   { $$ = new YYParserVal(new Int($1.sval)); }
-    | FLOAT_NUM { $$ = new YYParserVal(new FPNum($1.sval)); }
+    | INT_NUM   { $$ = new YYParserVal(Int.parse($1.sval)); }
+    | FLOAT_NUM { $$ = new YYParserVal(Real.parse($1.sval)); }
     | STRING    { $$ = new YYParserVal(Str.fromQuotedString($1.sval)); }
-    | NULL      { $$ = new YYParserVal(new Null()); }
+    | NULL      { $$ = new YYParserVal((Object)null); }
     | id        { $$ = $1; }
 
     | id ASSIGN expr       { $$ = new YYParserVal(new Assign((Id)$1.obj, (TreeNode)$3.obj)); }

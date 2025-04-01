@@ -1,9 +1,8 @@
 package ru.mephi.bakinaa.lab3.db.views;
 
 import lombok.Getter;
-import ru.mephi.bakinaa.lab3.db.Row;
-import ru.mephi.bakinaa.lab3.db.objects.Obj;
-import ru.mephi.bakinaa.lab3.lang.tree.terms.Id;
+import ru.mephi.bakinaa.lab3.commons.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.Id;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,7 @@ public class RowView {
         setIndex(rowIndex, getIndex(rowIndex) + 1);
     }
 
-    public Obj get(Id id) {
+    public SimpleObj get(Id id) {
         var col = tables.getColumn(id);
         if (rows.get(col.getTableId()) < 0)
             return null;
