@@ -6,7 +6,7 @@ import guru.nidi.graphviz.engine.Graphviz;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 import lombok.SneakyThrows;
-import ru.mephi.bakinaa.lab3.commons.*;
+import ru.mephi.bakinaa.lab3.commons.objects.*;
 import ru.mephi.bakinaa.lab3.lang.tree.Statements;
 import ru.mephi.bakinaa.lab3.lang.tree.Dot;
 import ru.mephi.bakinaa.lab3.lang.tree.ExprSet;

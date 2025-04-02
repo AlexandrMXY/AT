@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.lang.tree;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 @AllArgsConstructor
 @Getter

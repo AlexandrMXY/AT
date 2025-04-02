@@ -1,10 +1,12 @@
 package ru.mephi.bakinaa.lab3.db.views;
 
 import lombok.AllArgsConstructor;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
+import ru.mephi.bakinaa.lab3.db.ResultSet;
 import ru.mephi.bakinaa.lab3.db.core.Table;
 import ru.mephi.bakinaa.lab3.db.functions.filters.Condition;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.*;
 
@@ -12,6 +14,8 @@ public class TablesView {
     private final Map<String, Map<String, ColumnView>> columns = new HashMap<>();
     private final Map<String, Table> tables = new HashMap<>();
     private final Map<Integer, Table> tableIndexesMap = new HashMap<>();
+
+    private int limit = Integer.MAX_VALUE;
 
     private IJoin root;
 
@@ -34,7 +38,6 @@ public class TablesView {
     public Table getTable(int tableIndex) {
         return tableIndexesMap.get(tableIndex);
     }
-
     public int getTablesCnt() {
         return tables.size();
     }
@@ -70,6 +73,47 @@ public class TablesView {
         var view = new RowView(this);
         root.moveToNone(view);
         return next(view);
+    }
+
+    public void limit(int limit) {
+        if (limit < 0)
+            throw new IllegalArgumentException("Limit should not be less than zero");
+        this.limit = limit;
+    }
+
+    public ResultSet getResult() {
+        ResultSet resultSet = new ResultSet();
+        RowView rowView = first();
+        int count = 0;
+        while (rowView != null && count < limit) {
+            List<SimpleObj> resulRow = new ArrayList<>();
+            for (int tableIndex = 0; tableIndex < rowView.getRows().size(); tableIndex++) {
+                int indexInTable = rowView.getRows().get(tableIndex);
+                if (indexInTable < 0)
+                    continue;
+
+                Table table = tableIndexesMap.get(tableIndex);
+                table.getColumns().getColumnsMap().values().forEach((column) -> {
+                    setValInList(
+                            resulRow,
+                            resultSet.getOrCreateIndex(
+                                new Id(
+                                    table.getName(),
+                                    column.getName())),
+                            table.getRow(indexInTable).get(column.getIndex()));
+                });
+            }
+            resultSet.addRow(resulRow);
+            count++;
+            rowView = next(rowView);
+        }
+        return resultSet;
+    }
+
+    private static void setValInList(List<SimpleObj> list, int index, SimpleObj obj) {
+        for (int i = list.size(); i <= index; i++)
+            list.add(null);
+        list.set(index, obj);
     }
 
     private static abstract class IJoin {

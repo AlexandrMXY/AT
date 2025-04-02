@@ -1,8 +1,7 @@
-package ru.mephi.bakinaa.lab3.commons;
+package ru.mephi.bakinaa.lab3.commons.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 import lombok.ToString;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 
@@ -16,4 +15,9 @@ public class Str extends SimpleObj implements TreeNode {
         return new Str(str.substring(1, str.length() - 1));
     }
 
+
+    @Override
+    public String toString() {
+        return value;
+    }
 }

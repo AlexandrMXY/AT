@@ -7,15 +7,15 @@ import ru.mephi.bakinaa.lab3.db.core.Database;
 import ru.mephi.bakinaa.lab3.db.views.JoinType;
 import ru.mephi.bakinaa.lab3.db.core.Table;
 import ru.mephi.bakinaa.lab3.db.functions.filters.Condition;
-import ru.mephi.bakinaa.lab3.commons.Int;
-import ru.mephi.bakinaa.lab3.commons.SimpleObj;
-import ru.mephi.bakinaa.lab3.commons.Str;
+import ru.mephi.bakinaa.lab3.commons.objects.Int;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.objects.Str;
 import ru.mephi.bakinaa.lab3.db.views.RowView;
 import ru.mephi.bakinaa.lab3.db.views.TablesView;
 import ru.mephi.bakinaa.lab3.lang.QueryParser;
 import ru.mephi.bakinaa.lab3.lang.tree.Statements;
 import ru.mephi.bakinaa.lab3.lang.tree.defs.TableDefinition;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.utils.GVUtils;
 import ru.mephi.bakinaa.lab3.utils.MapBuilder;
 
@@ -84,10 +84,12 @@ public class Application {
                     ((Int)row.get(new Id("A", "b"))).value % 2 == 0;
         });
 
-        RowView row = tableView.first();
-        while (row != null) {
-            System.out.println(row);
-            row = tableView.next(row);
-        }
+//        RowView row = tableView.first();
+//        while (row != null) {
+//            System.out.println(row);
+//            row = tableView.next(row);
+//        }
+        tableView.limit(5);
+        System.out.println(tableView.getResult().toString());
     }
 }

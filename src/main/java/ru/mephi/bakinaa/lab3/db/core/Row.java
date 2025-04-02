@@ -1,6 +1,6 @@
 package ru.mephi.bakinaa.lab3.db.core;
 
-import ru.mephi.bakinaa.lab3.commons.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.ArrayList;

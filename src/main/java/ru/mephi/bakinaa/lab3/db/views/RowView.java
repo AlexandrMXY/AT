@@ -1,8 +1,8 @@
 package ru.mephi.bakinaa.lab3.db.views;
 
 import lombok.Getter;
-import ru.mephi.bakinaa.lab3.commons.SimpleObj;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -7,7 +7,7 @@ import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.lang.tree.ExprSet;
 import ru.mephi.bakinaa.lab3.lang.tree.defs.TableDefinition;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.ArrayList;
 import java.util.HashMap;

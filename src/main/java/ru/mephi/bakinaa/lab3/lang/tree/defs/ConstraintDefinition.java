@@ -6,7 +6,7 @@ import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.enums.Constraints;
 import ru.mephi.bakinaa.lab3.lang.tree.ExprSet;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 @AllArgsConstructor
 @Getter

@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.db.core;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
-import ru.mephi.bakinaa.lab3.commons.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.ArrayList;

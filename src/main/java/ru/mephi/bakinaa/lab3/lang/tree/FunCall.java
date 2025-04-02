@@ -1,7 +1,7 @@
 package ru.mephi.bakinaa.lab3.lang.tree;
 
 import lombok.Getter;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 @Getter
 public class FunCall implements TreeNode {

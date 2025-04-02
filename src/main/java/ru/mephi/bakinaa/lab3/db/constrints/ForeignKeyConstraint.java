@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.core.Row;
 import ru.mephi.bakinaa.lab3.db.core.Table;
-import ru.mephi.bakinaa.lab3.commons.SimpleObj;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 
 import java.util.List;
 import java.util.Map;

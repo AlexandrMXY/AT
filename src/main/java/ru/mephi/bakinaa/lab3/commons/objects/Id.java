@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.commons;
+package ru.mephi.bakinaa.lab3.commons.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -18,4 +18,5 @@ public class Id implements TreeNode {
     public String toString() {
         return scope == null ? value : scope + "::" + value;
     }
+
 }

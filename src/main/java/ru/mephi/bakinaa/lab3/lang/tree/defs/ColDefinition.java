@@ -6,7 +6,7 @@ import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.lang.enums.Types;
 import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
-import ru.mephi.bakinaa.lab3.commons.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.ArrayList;
 import java.util.List;
