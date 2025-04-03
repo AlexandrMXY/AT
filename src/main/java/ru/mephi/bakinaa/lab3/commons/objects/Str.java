@@ -3,12 +3,11 @@ package ru.mephi.bakinaa.lab3.commons.objects;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
-import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 
 @AllArgsConstructor
 @EqualsAndHashCode
 @ToString
-public class Str extends SimpleObj implements TreeNode {
+public class Str extends SimpleObj {
     public final String value;
 
     public static Str fromQuotedString(String str) {

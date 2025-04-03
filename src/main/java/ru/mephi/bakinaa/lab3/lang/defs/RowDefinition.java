@@ -1,21 +1,20 @@
-package ru.mephi.bakinaa.lab3.lang.tree.defs;
+package ru.mephi.bakinaa.lab3.lang.defs;
 
 import lombok.Getter;
+import ru.mephi.bakinaa.lab3.commons.Expression;
+import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
-import ru.mephi.bakinaa.lab3.lang.tree.Statements;
-import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
-import ru.mephi.bakinaa.lab3.lang.tree.ops.Assign;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-public class RowDefinition implements TreeNode {
-    private Map<Id, TreeNode> assigns = new HashMap<>();
+public class RowDefinition extends Obj {
+    private final Map<Id, Expression> assigns = new HashMap<>();
 
-    public RowDefinition(Statements statements) {
-        for (TreeNode expr : statements.getStatements()) {
+    public RowDefinition(Definitions definitions) {
+        for (Definition expr : definitions.getDefinitions()) {
             if (expr instanceof Assign assign) {
                 if (assigns.containsKey(assign.getLeft()))
                     throw new LangException("Illegal row definition: multiple assigment to col " + assign.getLeft().toString());

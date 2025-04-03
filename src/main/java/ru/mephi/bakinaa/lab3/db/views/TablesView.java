@@ -1,16 +1,17 @@
 package ru.mephi.bakinaa.lab3.db.views;
 
 import lombok.AllArgsConstructor;
+import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.ResultSet;
 import ru.mephi.bakinaa.lab3.db.core.Table;
-import ru.mephi.bakinaa.lab3.db.functions.filters.Condition;
+import ru.mephi.bakinaa.lab3.commons.Condition;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.*;
 
-public class TablesView {
+public class TablesView extends Obj {
     private final Map<String, Map<String, ColumnView>> columns = new HashMap<>();
     private final Map<String, Table> tables = new HashMap<>();
     private final Map<Integer, Table> tableIndexesMap = new HashMap<>();
@@ -82,7 +83,7 @@ public class TablesView {
     }
 
     public ResultSet getResult() {
-        ResultSet resultSet = new ResultSet();
+        ResultSet resultSet = new DefaultResultSet();
         RowView rowView = first();
         int count = 0;
         while (rowView != null && count < limit) {

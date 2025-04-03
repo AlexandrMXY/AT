@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Columns {
-    private Map<String, Column> columns = new HashMap<>();
-    private Map<Integer, Column> columnIndexesMap = new HashMap<>();
+    private final Map<String, Column> columns = new HashMap<>();
+    private final Map<Integer, Column> columnIndexesMap = new HashMap<>();
 
-    public int registerColumn(Column column) {
+    public void registerColumn(Column column) {
         if (columns.containsKey(column.getName()))
             throw new InvalidDBAccessException("Column with name " + column.getName() + " already exists");
 
@@ -23,7 +23,6 @@ public class Columns {
         columns.put(column.getName(), column);
         columnIndexesMap.put(index, column);
 
-        return index;
     }
 
     public int getIndex(String columnName) {
@@ -45,6 +44,7 @@ public class Columns {
         StringBuilder builder = new StringBuilder();
 
         columns.forEach((name, col) -> {
+            builder.append("\t");
             builder.append(name).append(" ").append(col.getIndex());
             if (!col.isNullable())
                 builder.append(" notnull");

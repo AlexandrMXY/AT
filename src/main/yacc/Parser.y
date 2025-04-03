@@ -1,12 +1,12 @@
 %{
+ import ru.mephi.bakinaa.lab3.db.context.Context;
  import ru.mephi.bakinaa.lab3.lang.*;
  import ru.mephi.bakinaa.lab3.exceptions.*;
- import ru.mephi.bakinaa.lab3.lang.tree.*;
- import ru.mephi.bakinaa.lab3.lang.tree.ops.*;
- import ru.mephi.bakinaa.lab3.lang.tree.defs.*;
- //import ru.mephi.bakinaa.lab3.lang.tree.terms.*;
+ import ru.mephi.bakinaa.lab3.lang.defs.*;
  import ru.mephi.bakinaa.lab3.lang.enums.*;
  import ru.mephi.bakinaa.lab3.commons.objects.*;
+ import ru.mephi.bakinaa.lab3.commons.*;
+ import ru.mephi.bakinaa.lab3.utils.ParserUtils;
 %}
 
 %token INT_NUM FLOAT_NUM STRING TRUE FALSE NULL ID
@@ -28,13 +28,15 @@
 
 %%
 
-statement: expr SEMICOLON { $$ = new YYParserVal(new Statements((TreeNode)$1.obj)); }
-    | tableDef SEMICOLON { $$ = new YYParserVal(new Statements((TreeNode)$1.obj)); }
-    | constraintDef SEMICOLON { $$ = new YYParserVal(new Statements((TreeNode)$1.obj)); }
-    | rowDef SEMICOLON { $$ = new YYParserVal(new Statements((TreeNode)$1.obj)); }
-    | statement statement { $$ = new YYParserVal(Statements.combine((TreeNode)$1.obj, (TreeNode)$2.obj)); }
+statements: expr SEMICOLON    { $$ = util.statement($1); }
+    | tableDef SEMICOLON      { $$ = util.statement($1); }
+    | statements statements   { $$ = util.statement($1, $2); }
 
-statementsGroup: CUR_BR_OPEN statement CUR_BR_CLOSE { $$ = $2; }
+definitionsGroup: CUR_BR_OPEN definition CUR_BR_CLOSE { $$ = $2; }
+definition: id ASSIGN expr SEMICOLON { $$ = new YYParserVal(new Definitions(new Assign((Id)$1.obj, (Expression)$3.obj))); }
+    | constraintDef SEMICOLON        { $$ = new YYParserVal(new Definitions((Definition) $1.obj)); }
+    | colDef SEMICOLON               { $$ = new YYParserVal(new Definitions((Definition) $1.obj)); }
+    | definition definition          { $$ = new YYParserVal(((Definitions)$1.obj).add((Definitions)$2.obj)); }
 
 expr: TRUE      { $$ = new YYParserVal(Bool.TRUE); }
     | FALSE     { $$ = new YYParserVal(Bool.FALSE); }
@@ -44,46 +46,43 @@ expr: TRUE      { $$ = new YYParserVal(Bool.TRUE); }
     | NULL      { $$ = new YYParserVal((Object)null); }
     | id        { $$ = $1; }
 
-    | id ASSIGN expr       { $$ = new YYParserVal(new Assign((Id)$1.obj, (TreeNode)$3.obj)); }
+    | expr LESS expr       { $$ = util.fun(Functions.LESS, $1, $3); }
+    | expr GREATER expr    { $$ = util.fun(Functions.GREATER, $1, $3); }
+    | expr LESS_EQ expr    { $$ = util.fun(Functions.LESS_EQ, $1, $3); }
+    | expr GREATER_EQ expr { $$ = util.fun(Functions.GREATER_EQ, $1, $3); }
+    | expr EQUALS expr     { $$ = util.fun(Functions.EQ, $1, $3); }
+    | expr NOT_EQUALS expr { $$ = util.fun(Functions.NOT_EQ, $1, $3); }
 
-    | expr LESS expr       { $$ = new YYParserVal(new Compare(ComparisonMode.LESS      , (TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | expr GREATER expr    { $$ = new YYParserVal(new Compare(ComparisonMode.GREATER   , (TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | expr LESS_EQ expr    { $$ = new YYParserVal(new Compare(ComparisonMode.LESS_EQ   , (TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | expr GREATER_EQ expr { $$ = new YYParserVal(new Compare(ComparisonMode.GREATER_EQ, (TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | expr EQUALS expr     { $$ = new YYParserVal(new Compare(ComparisonMode.EQUAL     , (TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | expr NOT_EQUALS expr { $$ = new YYParserVal(new Compare(ComparisonMode.NOT_EQ    , (TreeNode)$1.obj, (TreeNode)$3.obj)); }
+    | expr OR expr  { $$ = util.fun(Functions.AND, $1, $3); }
+    | expr AND expr { $$ = util.fun(Functions.OR, $1, $3); }
+    | NOT expr      { $$ = util.fun(Functions.NOT, $2); }
 
-    | expr OR expr  { $$ = new YYParserVal(new Or((TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | expr AND expr { $$ = new YYParserVal(new And((TreeNode)$1.obj, (TreeNode)$3.obj)); }
-    | NOT expr      { $$ = new YYParserVal(new Not((TreeNode)$2.obj)); }
-
-    | expr DOT id   { $$ = new YYParserVal(new Dot((TreeNode)$1.obj, (Id)$3.obj)); }
-
-    | ROW statementsGroup                 { $$ = new YYParserVal(new RowDefinition((Statements)$2.obj)); }
+    | ROW definitionsGroup                { $$ = new YYParserVal(new RowDefinition((Definitions)$2.obj)); }
     | PAR_OPEN expr PAR_CLOSE             { $$ = $2; }
-    | id PAR_OPEN args PAR_CLOSE          { $$ = new YYParserVal(new FunCall((Id)$1.obj, (TreeNode)$3.obj)); }
-    | expr DOT id PAR_OPEN args PAR_CLOSE { $$ = new YYParserVal(new FunCall((TreeNode)$1.obj, (Id)$3.obj, (TreeNode)$5.obj)); }
+    | id PAR_OPEN args PAR_CLOSE          { $$ = util.fun($1, (FunArgs)$3.obj); }
+    | expr DOT id PAR_OPEN args PAR_CLOSE { $$ = util.fun($3, $1, (FunArgs)$5.obj); }
 
 args: exprs { $$ = $1; }
-exprs: expr             { $$ = $1; }
-    | exprs COMA exprs  { $$ = new YYParserVal(ExprSet.combine((TreeNode)$1.obj, (TreeNode)$3.obj)); }
+exprs: expr             { $$ = new YYParserVal(new FunArgs((Expression)$1.obj)); }
+    | exprs COMA exprs  { $$ = new YYParserVal(((FunArgs)$1.obj).addAll((FunArgs)$3.obj)); }
 
 id: ID { $$ = new YYParserVal(new Id($1.sval)); }
     | ID SCOPE_OPERATOR ID { $$ = new YYParserVal(new Id($1.sval, $3.sval)); }
 
-rowDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, (Id)$2.obj)); }
-    | MODIFIER rowDef { ((ColDefinition)$2.obj).addModifier(Modifier.parse($1.sval)); $$ = $2; }
+colDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, (Id)$2.obj)); }
+    | MODIFIER colDef { ((ColDefinition)$2.obj).addModifier(Modifier.parse($1.sval)); $$ = $2; }
 
-constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (ExprSet)$3.obj)); }
+constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (FunArgs)$3.obj)); }
     | id ARROW id { $$ = new YYParserVal(ConstraintDefinition.foreignKey((Id)$1.obj, (Id)$3.obj)); }
 
-tableDef: INDEX_TYPE RELATIONSHIP id statementsGroup { $$ = new YYParserVal(new TableDefinition((Statements)$4.obj, (Id)$3.obj)); }
-    | RELATIONSHIP id statementsGroup { $$ = new YYParserVal(new TableDefinition((Statements)$3.obj, (Id)$2.obj)); }
+tableDef: INDEX_TYPE RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$4.obj, (Id)$3.obj)); }
+    | RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$3.obj, (Id)$2.obj)); }
 
 %%
 
 
-
+ParserUtils util;
+Context ctx;
 QueryParser parser;
 
 int yylex() {

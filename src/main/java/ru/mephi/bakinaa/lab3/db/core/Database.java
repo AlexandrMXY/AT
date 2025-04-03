@@ -4,9 +4,9 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
+import ru.mephi.bakinaa.lab3.lang.FunArgs;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
-import ru.mephi.bakinaa.lab3.lang.tree.ExprSet;
-import ru.mephi.bakinaa.lab3.lang.tree.defs.TableDefinition;
+import ru.mephi.bakinaa.lab3.lang.defs.TableDefinition;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
 import java.util.ArrayList;
@@ -24,11 +24,17 @@ public class Database {
         return tables.get(name);
     }
 
+    public Table getTable(Id id) {
+        if (id.scope != null)
+            throw new InvalidDBAccessException("Illegal id");
+        return getTable(id.value);
+    }
+
     public void createTable(TableDefinition definition) {
         Table table = new Table(this, definition.getId().value);
 
         for (var colDef : definition.getCols()) {
-            Column col = new Column(colDef.getName());
+            Column col = new Column(colDef.getName(), colDef.getType());
             table.getColumns().registerColumn(col);
 
             for (Modifier modifier : colDef.getModifiers()) {
@@ -67,7 +73,7 @@ public class Database {
             switch (constrDef.getConstraint()) {
                 case null -> throw new NullPointerException();
                 case UNIQUE -> {
-                    List<Integer> constraintCols = getColumnsIdsFromExprArg(constrDef.getArgs(), table);
+                    List<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), table);
                     table.addConstraint(new UniqueConstraint(constraintCols));
                 }
                 case PREDICATE -> {
@@ -75,10 +81,10 @@ public class Database {
                     throw new UnsupportedOperationException();
                 }
                 case FOREIGN_KEY -> {
-                    if (constrDef.getArgs().getExprs().size() != 2)
+                    if (constrDef.getArgs().getArgs().size() != 2)
                         throw new IllegalArgumentException();
-                    Id from = (Id)constrDef.getArgs().getExprs().get(0);
-                    Id to = (Id)constrDef.getArgs().getExprs().get(1);
+                    Id from = (Id) constrDef.getArgs().getArgs().get(0);
+                    Id to = (Id) constrDef.getArgs().getArgs().get(1);
 
                     if (from.scope != null)
                         throw new InvalidDBAccessException("Illegal id");
@@ -103,26 +109,26 @@ public class Database {
                     if (table.getPKey() != null)
                         throw new InvalidDBAccessException("Multiple primary keys");
 
-                    List<Integer> constraintCols = getColumnsIdsFromExprArg(constrDef.getArgs(), table);
+                    List<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), table);
                     table.addConstraint(new PrimaryKeyConstraint(constraintCols));
                 }
             }
         }
     }
 
-    private List<Integer> getColumnsIdsFromExprArg(ExprSet exprSet, Table table) {
+    private List<Integer> getColumnsIdsFromArg(FunArgs args, Table table) {
         Columns columns = table.getColumns();
         List<Integer> result = new ArrayList<>();
 
-        for (var node : exprSet.getExprs()) {
-            if (node instanceof Id id) {
+        for (var arg : args.getArgs()) {
+            if (arg instanceof Id id) {
                 if (id.scope != null)
                     throw new InvalidDBAccessException("Illegal id");
                 int colIndex = columns.getIndex(id.value);
                 if (colIndex < 0)
                     throw new InvalidDBAccessException("Unknown column " + id.value);
                 result.add(colIndex);
-            } else throw new IllegalArgumentException("Ids expected as args");
+            } else throw new IllegalArgumentException("Ids expected as args of constraint");
         }
 
         return result;
@@ -134,7 +140,7 @@ public class Database {
         StringBuilder builder = new StringBuilder();
         builder.append("======= Database ").append(name).append(" =======\n");
 
-        tables.forEach((name, table) -> builder.append(table.toString()));
+        tables.forEach((name, table) -> builder.append(table.toString()).append("\n"));
 
         return builder.toString();
     }

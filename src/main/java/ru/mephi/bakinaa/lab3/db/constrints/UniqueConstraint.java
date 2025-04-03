@@ -11,7 +11,7 @@ import java.util.*;
 @Getter
 @RequiredArgsConstructor
 public class UniqueConstraint extends Constraint {
-    private static final Map<Integer, SimpleObj> EMPTY = Collections.unmodifiableMap(new HashMap<>());
+    protected static final Map<Integer, SimpleObj> EMPTY = Collections.unmodifiableMap(new HashMap<>());
     protected final List<Integer> cols;
 
     @Override

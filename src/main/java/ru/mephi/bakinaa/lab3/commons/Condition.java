@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.functions.filters;
+package ru.mephi.bakinaa.lab3.commons;
 
 import ru.mephi.bakinaa.lab3.db.views.RowView;
 import ru.mephi.bakinaa.lab3.db.views.TablesView;

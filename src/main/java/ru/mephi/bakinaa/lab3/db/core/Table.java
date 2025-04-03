@@ -2,9 +2,11 @@ package ru.mephi.bakinaa.lab3.db.core;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
+import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,10 +62,25 @@ public class Table {
     }
 
     public void insert(Row row) {
+        for (Column c : columns.getColumnsMap().values()) {
+            if (!c.getType().isInstance(row.get(c.getIndex())))
+                throw new InvalidDBAccessException("Illegal type");
+        }
         for (Constraint c : constraints)
             if (!c.checkOnInsert(this, row))
                 throw new InvalidDBAccessException("Unable to insert row: row volatiles constraint " + c.toString());
         rows.add(row);
+    }
+
+    public void insert(RowDefinition rowDefinition) {
+        Row row = new Row();
+        ExpressionContext ctx = ExpressionContext.forDatabase(database);
+        rowDefinition.getAssigns().forEach((id, expr) -> {
+            if (id.scope != null && !id.scope.equals(name))
+                throw new InvalidDBAccessException("Invalid scope");
+            row.set(columns.getColumn(id.value).getIndex(), (SimpleObj) expr.call(ctx));
+        });
+        insert(row);
     }
 
     public void insert(Map<String, SimpleObj> rowData) {
@@ -89,6 +106,7 @@ public class Table {
         builder.append("Columns:\n").append(columns);
         builder.append("Constraints:\n");
         for (Constraint constraint : constraints) {
+            builder.append("\t");
             switch (constraint) {
                 case UniqueConstraint c -> {
                     builder.append(c.getClass().getSimpleName()).append("(");
@@ -112,6 +130,10 @@ public class Table {
                     builder.append(constraint.toString()).append("\n");
             }
         }
+        builder.append("Data [").append(rows.size()).append(" rows]:\n");
+        for (Row row : rows)
+            builder.append("\t").append(row).append("\n");
+
 
         return builder.toString();
     }

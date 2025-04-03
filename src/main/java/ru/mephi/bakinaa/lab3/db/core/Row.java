@@ -44,4 +44,14 @@ public class Row {
         res.set(colId, val);
         return res;
     }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+
+        for (var obj : data)
+            builder.append(obj).append(" ");
+
+        return builder.toString();
+    }
 }

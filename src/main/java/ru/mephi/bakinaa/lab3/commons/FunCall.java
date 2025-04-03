@@ -1,20 +1,26 @@
 package ru.mephi.bakinaa.lab3.commons;
 
 
-public final class FunCall<T extends Obj> implements FunArgument {
-    private final FunArgument[] args;
-    private final Fun<T> fun;
+import lombok.Getter;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
-    public FunCall(Fun<T> fun, FunArgument... args) {
+@Getter
+public final class FunCall<T extends Obj> implements Expression {
+    private final Fun<T> fun;
+    private final Expression[] args;
+
+    public FunCall(Fun<T> fun, Expression... args) {
         this.args = args;
         this.fun = fun;
     }
 
-    public T call() {
-        for (int i = 0; i < args.length; i++) {
-            if (args[i] instanceof FunCall<?> call)
-                args[i] = call.call();
-        }
-        return fun.call(args);
+    public T call(ExpressionContext ctx) {
+        Obj[] objArgs = new Obj[args.length];
+        for (int i = 0; i < args.length; i++)
+            if (args[i] instanceof Obj id)
+                objArgs[i] = id;
+            else
+                objArgs[i] = args[i] == null ? null : args[i].call(ctx);
+        return fun.call(ctx, objArgs);
     }
 }

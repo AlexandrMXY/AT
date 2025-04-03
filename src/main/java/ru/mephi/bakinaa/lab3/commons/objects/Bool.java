@@ -2,12 +2,10 @@ package ru.mephi.bakinaa.lab3.commons.objects;
 
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import ru.mephi.bakinaa.lab3.lang.tree.TreeNode;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Bool extends SimpleObj implements TreeNode {
+public class Bool extends SimpleObj {
     public static final Bool TRUE = new Bool(true);
     public static final Bool FALSE = new Bool(false);
 

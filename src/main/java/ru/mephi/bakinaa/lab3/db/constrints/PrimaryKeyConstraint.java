@@ -14,17 +14,17 @@ public class PrimaryKeyConstraint extends UniqueConstraint {
 
     @Override
     public boolean checkOnInsert(Table table, Row row) {
-        return checkNonNull(row) && super.checkOnInsert(table, row);
+        return checkNonNull(row, EMPTY) && super.checkOnInsert(table, row);
     }
 
     @Override
     public boolean checkOnModify(Table table, Row row, Map<Integer, SimpleObj> updates) {
-        return checkNonNull(row) && super.checkOnModify(table, row, updates);
+        return checkNonNull(row, updates) && super.checkOnModify(table, row, updates);
     }
 
-    private boolean checkNonNull(Row row) {
+    private boolean checkNonNull(Row row, Map<Integer, SimpleObj> updates) {
         for (int i : cols)
-            if (row.get(i) != null)
+            if (updates.getOrDefault(i, row.get(i)) != null)
                 return true;
         return false;
     }
