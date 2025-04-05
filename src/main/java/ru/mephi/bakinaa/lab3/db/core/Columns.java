@@ -1,13 +1,21 @@
 package ru.mephi.bakinaa.lab3.db.core;
 
+import lombok.RequiredArgsConstructor;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
+import ru.mephi.bakinaa.lab3.db.relations.RowMapping;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
-public class Columns {
+@RequiredArgsConstructor
+public class Columns implements RowMapping {
+    private final String tableName;
     private final Map<String, Column> columns = new HashMap<>();
     private final Map<Integer, Column> columnIndexesMap = new HashMap<>();
+    private final Set<Id> columnsSet = new HashSet<>();
 
     public void registerColumn(Column column) {
         if (columns.containsKey(column.getName()))
@@ -22,7 +30,7 @@ public class Columns {
 
         columns.put(column.getName(), column);
         columnIndexesMap.put(index, column);
-
+        columnsSet.add(new Id(tableName, column.getName()));
     }
 
     public int getIndex(String columnName) {
@@ -61,4 +69,20 @@ public class Columns {
     public Column getColumn(int index) {
         return columnIndexesMap.get(index);
     }
+
+    @Override
+    public int getIncompleteIdIndex(Id id) {
+        if (id.scope != null && !id.scope.equals(tableName))
+            throw new InvalidDBAccessException("Unknown table column " + id);
+        if (!columns.containsKey(id.value))
+            throw new InvalidDBAccessException("Unknown table column " + id);
+        return columns.get(id.value).getIndex();
+    }
+
+    @Override
+    public Set<Id> getColumns() {
+        return columnsSet;
+    }
+
+
 }

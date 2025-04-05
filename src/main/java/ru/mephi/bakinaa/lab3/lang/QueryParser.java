@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.lang;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ru.mephi.bakinaa.lab3.commons.Expressions;
-import ru.mephi.bakinaa.lab3.db.context.Context;
+import ru.mephi.bakinaa.lab3.db.context.Registry;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.utils.GVUtils;
 import ru.mephi.bakinaa.lab3.utils.ParserUtils;
@@ -15,12 +15,11 @@ public class QueryParser {
     private final Lexer lexer;
     private final YYParser parser;
 
-    public QueryParser(String query, Context context) {
+    public QueryParser(String query, Registry registry) {
         lexer = new Lexer(new StringReader(query));
         parser = new YYParser(true);
         parser.parser = this;
-        parser.ctx = context;
-        parser.util = new ParserUtils(context);
+        parser.util = new ParserUtils(registry);
     }
 
     public Expressions parse() {

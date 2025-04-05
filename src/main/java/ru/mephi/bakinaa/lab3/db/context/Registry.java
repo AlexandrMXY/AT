@@ -4,6 +4,6 @@ import ru.mephi.bakinaa.lab3.commons.Fun;
 
 import javax.annotation.Nullable;
 
-public interface Context {
+public interface Registry {
     @Nullable Fun<?> getFunction(String name);
 }

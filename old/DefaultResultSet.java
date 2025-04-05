@@ -1,20 +1,18 @@
-package ru.mephi.bakinaa.lab3.db.views;
+package ru.mephi.bakinaa.lab3.db.views__;
 
 import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.ResultSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-public class SortedResultSet extends ResultSet {
-    private final SortedSet<ResultRow> data;
-
-    public SortedResultSet(Comparator<ResultRow> comparator) {
-        this.data = new TreeSet<>(comparator);
-    }
+public class DefaultResultSet extends ResultSet {
+    private List<ResultRow> data = new ArrayList<>();
 
     @Override
-    public void addRow(List<SimpleObj> objs)  {
+    public void addRow(List<SimpleObj> objs) {
         data.add(new ResultRow(objs));
     }
 

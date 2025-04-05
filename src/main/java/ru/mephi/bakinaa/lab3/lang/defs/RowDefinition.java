@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Getter
-public class RowDefinition extends Obj {
+public class RowDefinition implements Obj {
     private final Map<Id, Expression> assigns = new HashMap<>();
 
     public RowDefinition(Definitions definitions) {

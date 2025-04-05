@@ -1,5 +1,4 @@
 %{
- import ru.mephi.bakinaa.lab3.db.context.Context;
  import ru.mephi.bakinaa.lab3.lang.*;
  import ru.mephi.bakinaa.lab3.exceptions.*;
  import ru.mephi.bakinaa.lab3.lang.defs.*;
@@ -82,7 +81,6 @@ tableDef: INDEX_TYPE RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new
 
 
 ParserUtils util;
-Context ctx;
 QueryParser parser;
 
 int yylex() {

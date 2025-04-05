@@ -1,30 +1,37 @@
 package ru.mephi.bakinaa.lab3.db.core;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
+import ru.mephi.bakinaa.lab3.db.relations.AbstractRelation;
+import ru.mephi.bakinaa.lab3.db.relations.RowView;
+import ru.mephi.bakinaa.lab3.db.relations.SimpleRowView;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@RequiredArgsConstructor
-public class Table {
-    private final Database database;
-
+public class Table extends AbstractRelation {
     private final String name;
-    private final Columns columns = new Columns();
+    private final Columns columns;
     private final List<Constraint> constraints = new ArrayList<>();
 
     private final List<Row> rows = new ArrayList<>();
 
     private List<Integer> pKey;
+
+    public Table(Database database, String name) {
+        super(database);
+        this.name = name;
+        columns = new Columns(name);
+    }
 
     public void setPKey(List<Integer> pKeyCols) {
         addConstraint(new PrimaryKeyConstraint(pKeyCols));
@@ -74,7 +81,7 @@ public class Table {
 
     public void insert(RowDefinition rowDefinition) {
         Row row = new Row();
-        ExpressionContext ctx = ExpressionContext.forDatabase(database);
+        ExpressionContext ctx = ExpressionContext.create(database);
         rowDefinition.getAssigns().forEach((id, expr) -> {
             if (id.scope != null && !id.scope.equals(name))
                 throw new InvalidDBAccessException("Invalid scope");
@@ -136,6 +143,42 @@ public class Table {
 
 
         return builder.toString();
+    }
+
+    @Override
+    public int getSize() {
+        return rows.size();
+    }
+
+    @Override
+    public RowView getByIndex(int index) {
+        if (getSize() > getSize() || index < 0)
+            return null;
+        return new SimpleRowView(this, index);
+    }
+
+    @Override
+    public RowView first() {
+        if (getSize() == 0)
+            return null;
+        return new SimpleRowView(this, 0);
+    }
+
+    @Override
+    public void moveToIndex(RowView view, int index) {
+        if (view instanceof SimpleRowView rowView) {
+            rowView.setIndex(index);
+        } else throw new IllegalArgumentException();
+    }
+
+    @Override
+    public SimpleObj get(int rowId, Id columnId) {
+        return rows.get(rowId).get(columns.getIncompleteIdIndex(columnId));
+    }
+
+    @Override
+    public Set<Id> getColumnsSet() {
+        return columns.getColumns();
     }
 }
 

@@ -7,7 +7,7 @@ import ru.mephi.bakinaa.lab3.commons.Obj;
 
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Id extends Obj {
+public class Id implements Obj {
     public String scope = null;
     public String value;
 

@@ -11,36 +11,60 @@ import java.util.Objects;
 
 @UtilityClass
 public class Functions {
-    public static final Fun<Bool> AND = (ctx, args) -> Bool.of(((Bool)args[0]).value && ((Bool)args[1]).value);
-    public static final Fun<Bool> OR  = (ctx, args) -> Bool.of(((Bool)args[0]).value || ((Bool)args[1]).value);
-    public static final Fun<Bool> NOT = (ctx, args) -> Bool.of(!((Bool)args[0]).value);
+    public static final Fun<Bool> AND = (ctx, args) -> Bool.of(((Bool)call(args[0], ctx)).value && ((Bool)call(args[1], ctx)).value);
+    public static final Fun<Bool> OR  = (ctx, args) -> Bool.of(((Bool)call(args[0], ctx)).value || ((Bool)call(args[1], ctx)).value);
+    public static final Fun<Bool> NOT = (ctx, args) -> Bool.of(!((Bool)call(args[0], ctx)).value);
 
-    public static final Fun<Bool> LESS = ((ctx, args) -> Bool.of(
-            args[0] instanceof Int ?
-                    ((Int)args[0]).value < ((Int)args[1]).value :
-                    ((Real)args[0]).value < ((Real)args[1]).value
-    ));
-    public static final Fun<Bool> GREATER = ((ctx, args) -> Bool.of(
-            args[0] instanceof Int ?
-                    ((Int)args[0]).value > ((Int)args[1]).value :
-                    ((Real)args[0]).value > ((Real)args[1]).value
-    ));
-    public static final Fun<Bool> LESS_EQ = ((ctx, args) -> Bool.of(
-            args[0] instanceof Int ?
-                    ((Int)args[0]).value <= ((Int)args[1]).value :
-                    ((Real)args[0]).value <= ((Real)args[1]).value
-    ));
-    public static final Fun<Bool> GREATER_EQ = ((ctx, args) -> Bool.of(
-            args[0] instanceof Int ?
-                    ((Int)args[0]).value >= ((Int)args[1]).value :
-                    ((Real)args[0]).value >= ((Real)args[1]).value
-    ));
     public static final Fun<Bool> EQ = ((ctx, args) -> Bool.of(
-            Objects.equals(args[0], args[1])
+            Objects.equals(call(args[0], ctx), call(args[1], ctx))
     ));
     public static final Fun<Bool> NOT_EQ = ((ctx, args) -> Bool.of(
-            !Objects.equals(args[0], args[1])
+            !Objects.equals(call(args[0], ctx), call(args[1], ctx))
     ));
+
+
+    public static final Fun<Bool> GREATER_EQ = ((ctx, args) -> {
+        Obj left = call(args[0], ctx);
+        Obj right = call(args[1], ctx);
+        if (left == null || right == null)
+            return Bool.of(right == left);
+        if (left instanceof Int left0)
+            return Bool.of(left0.value >= ((Int)right).value);
+        return Bool.of(((Real)left).value >= ((Real)right).value);
+    });
+    public static final Fun<Bool> LESS_EQ = ((ctx, args) -> {
+        Obj left = call(args[0], ctx);
+        Obj right = call(args[1], ctx);
+        if (left == null || right == null)
+            return Bool.of(right == left);
+        if (left instanceof Int left0)
+            return Bool.of(left0.value <= ((Int)right).value);
+        return Bool.of(((Real)left).value <= ((Real)right).value);
+    });
+    public static final Fun<Bool> GREATER = ((ctx, args) -> {
+        Obj left = call(args[0], ctx);
+        Obj right = call(args[1], ctx);
+        if (left == null || right == null)
+            return Bool.of(left != null);
+        if (left instanceof Int left0)
+            return Bool.of(left0.value > ((Int)right).value);
+        return Bool.of(((Real)left).value > ((Real)right).value);
+    });
+    public static final Fun<Bool> LESS = ((ctx, args) -> {
+        Obj left = call(args[0], ctx);
+        Obj right = call(args[1], ctx);
+        if (left == null || right == null)
+            return Bool.of(right != null);
+        if (left instanceof Int left0)
+            return Bool.of(left0.value < ((Int)right).value);
+        return Bool.of(((Real)left).value < ((Real)right).value);
+    });
+
+
+    private static Obj call(Expression expression, ExpressionContext ctx) {
+        return expression == null ? null : expression.call(ctx);
+    }
+    
 
     public static Fun<?> createTable(TableDefinition tableDefinition) {
         return new Fun<Obj>() {

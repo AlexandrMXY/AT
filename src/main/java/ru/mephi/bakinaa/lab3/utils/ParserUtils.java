@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.utils;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.*;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
-import ru.mephi.bakinaa.lab3.db.context.Context;
+import ru.mephi.bakinaa.lab3.db.context.Registry;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.FunArgs;
 import ru.mephi.bakinaa.lab3.lang.YYParserVal;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class ParserUtils {
-    private final Context ctx;
+    private final Registry ctx;
 
 
     public YYParserVal statement(YYParserVal left, YYParserVal right) {

@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.views;
+package ru.mephi.bakinaa.lab3.db.views__;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

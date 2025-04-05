@@ -27,6 +27,6 @@ public class Expressions {
         Obj res = null;
         for (var expr : expressions)
             res = expr.call(ctx);
-        return null;
+        return res;
     }
 }

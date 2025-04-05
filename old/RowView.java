@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.views;
+package ru.mephi.bakinaa.lab3.db.views__;
 
 import lombok.Getter;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;

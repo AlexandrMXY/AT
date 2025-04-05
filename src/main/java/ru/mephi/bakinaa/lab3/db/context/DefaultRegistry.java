@@ -1,13 +1,18 @@
 package ru.mephi.bakinaa.lab3.db.context;
 
+import ru.mephi.bakinaa.lab3.commons.Expression;
+import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.Fun;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Int;
+import ru.mephi.bakinaa.lab3.db.JoinType;
+import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultContext implements Context {
+public class DefaultRegistry implements Registry {
     private final Map<String, Fun<?>> functions = new HashMap<>();
 
     @Override
@@ -56,22 +61,22 @@ public class DefaultContext implements Context {
             throw new UnsupportedOperationException("Unimplemented");
         }));
         functions.put("limit", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).limit(((Int)args[1].call(ctx)).asInt32());
         }));
         functions.put("skip", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).skip(((Int)args[1].call(ctx)).asInt32());
         }));
         functions.put("join", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).join(relation(ctx, args[1]), JoinType.INNER, args[2]);
         }));
         functions.put("leftJoin", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).join(relation(ctx, args[1]), JoinType.LEFT, args[2]);
         }));
         functions.put("rightJoin", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).join(relation(ctx, args[1]), JoinType.RIGHT, args[2]);
         }));
         functions.put("fullJoin", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).join(relation(ctx, args[1]), JoinType.FULL, args[2]);
         }));
         functions.put("min", ((ctx, args) -> {
             throw new UnsupportedOperationException("Unimplemented");
@@ -89,26 +94,32 @@ public class DefaultContext implements Context {
             throw new UnsupportedOperationException("Unimplemented");
         }));
         functions.put("count", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).count();
         }));
         functions.put("isEmpty", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).isEmpty();
         }));
         functions.put("anyMatch", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).anyMatch(args[1]);
         }));
         functions.put("allMatch", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).allMatch(args[1]);
         }));
         functions.put("contains", ((ctx, args) -> {
             throw new UnsupportedOperationException("Unimplemented");
         }));
         functions.put("insert", ((ctx, args) -> {
-            ctx.getDatabase().getTable((Id)args[0]).insert((RowDefinition) args[1]);
+            ctx.getDatabase().getTable((Id)args[0]).insert((RowDefinition) args[1].call(ctx));
             return null;
         }));
         functions.put("removeIf", ((ctx, args) -> {
             throw new UnsupportedOperationException("Unimplemented");
         }));
+    }
+
+    private static Relation relation(ExpressionContext ctx, Expression expression) {
+        if (expression instanceof Id id)
+            return ctx.getDatabase().getTable(id);
+        return (Relation) expression;
     }
 }

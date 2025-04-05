@@ -4,22 +4,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
-import ru.mephi.bakinaa.lab3.db.context.DefaultContext;
+import ru.mephi.bakinaa.lab3.db.context.DefaultRegistry;
 import ru.mephi.bakinaa.lab3.db.core.Database;
-import ru.mephi.bakinaa.lab3.db.views.JoinType;
-import ru.mephi.bakinaa.lab3.db.core.Table;
-import ru.mephi.bakinaa.lab3.commons.Condition;
-import ru.mephi.bakinaa.lab3.commons.objects.Int;
-import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
-import ru.mephi.bakinaa.lab3.commons.objects.Str;
-import ru.mephi.bakinaa.lab3.db.views.TablesView;
+import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.lang.QueryParser;
-import ru.mephi.bakinaa.lab3.lang.defs.TableDefinition;
-import ru.mephi.bakinaa.lab3.commons.objects.Id;
-import ru.mephi.bakinaa.lab3.utils.GVUtils;
-import ru.mephi.bakinaa.lab3.utils.MapBuilder;
-
-import java.util.Objects;
 
 @SpringBootApplication
 @Slf4j
@@ -51,17 +39,51 @@ public class Application {
                 c = "dfe";
                 d = 77 < 88 || true;
             });
+            A.insert(row {
+                a = "sinx1";
+                b = 1111;
+                c = "dfe1";
+                d = 77 < 88 || true;
+            });
+            A.insert(row {
+                a = "sinx11";
+                b = 11111;
+                c = "dfe11";
+                d = 77 < 88 || true;
+            });
+            B.insert(row {
+                a = "sinx";
+                b = 222;
+                c = "dfe2";
+                d = 77 < 88 || true;
+            });
+            B.insert(row {
+                a = "sinx1";
+                b = 2222;
+                c = "dfe22";
+                d = 77 < 88 || true;
+            });
+            B.insert(row {
+                a = "sinx11";
+                b = 22222;
+                c = "dfe222";
+                d = 77 < 88 || true;
+            });
+            A.join(B, A::b < B::b);
             """;
 
 
     @PostConstruct
     public void init() {
-        var res = new QueryParser(q, new DefaultContext()).parse();
+        var query = new QueryParser(q, new DefaultRegistry()).parse();
         Database database = new Database("db");
-        //GVUtils.save(res, "1.png");
-        res.call(new ExpressionContext(database, null));
+
+        Relation rel = (Relation)query.call(ExpressionContext.create(database, null));
 
         System.out.println(database);
+
+        System.out.println(rel);
+
 
 //        Database database = new Database("db");
 //        for (var statement : ((Statements)res).getStatements()) {
