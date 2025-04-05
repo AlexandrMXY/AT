@@ -1,18 +1,21 @@
 package ru.mephi.bakinaa.lab3.db.context;
 
-import ru.mephi.bakinaa.lab3.commons.Expression;
-import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
-import ru.mephi.bakinaa.lab3.commons.Fun;
+import ru.mephi.bakinaa.lab3.commons.*;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
+import ru.mephi.bakinaa.lab3.commons.objects.Real;
 import ru.mephi.bakinaa.lab3.db.JoinType;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
+import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class DefaultRegistry implements Registry {
+    public static final Id REDUCE_ACCUMULATOR_VARIABLE = Relation.REDUCE_ACCUMULATOR_VARIABLE;
     private final Map<String, Fun<?>> functions = new HashMap<>();
 
     @Override
@@ -78,20 +81,30 @@ public class DefaultRegistry implements Registry {
         functions.put("fullJoin", ((ctx, args) -> {
             return relation(ctx, args[0]).join(relation(ctx, args[1]), JoinType.FULL, args[2]);
         }));
+        functions.put("group", ((ctx, args) -> {
+            if (args.length < 3)
+                throw new InvalidDBAccessException("Invalid group function usage.");
+            Relation rel = relation(ctx, args[0]);
+            Set<Id> cols = new HashSet<>();
+            for (int i = 1; i < args.length - 1; i++)
+                cols.add((Id) args[i]);
+            RowDefinition aggregator = (RowDefinition) args[args.length - 1];
+            return rel.group(cols, aggregator);
+        }));
         functions.put("min", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return ctx.getRelation().reduce(null, new FunCall<>(Functions.MIN, REDUCE_ACCUMULATOR_VARIABLE, (Id)args[0]));
         }));
         functions.put("max", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return ctx.getRelation().reduce(null, new FunCall<>(Functions.MAX, REDUCE_ACCUMULATOR_VARIABLE, (Id)args[0]));
         }));
         functions.put("sum", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return ctx.getRelation().reduce(null, new FunCall<>(Functions.ADD, REDUCE_ACCUMULATOR_VARIABLE, (Id)args[0]));
         }));
         functions.put("groupSize", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return ctx.getRelation().count();
         }));
         functions.put("reduce", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return ctx.getRelation().reduce(args[0], args[1]);
         }));
         functions.put("count", ((ctx, args) -> {
             return relation(ctx, args[0]).count();

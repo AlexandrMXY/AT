@@ -54,4 +54,32 @@ public class Row {
 
         return builder.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Row row = (Row) o;
+        int len = Math.max(data.size(), row.data.size());
+        for (int i = 0; i < len; i++) {
+            if (!Objects.equals(get(i), row.get(i)))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        int offset = 0;
+        for (SimpleObj obj : data) {
+            offset = (offset + 1) % 32;
+            if (obj != null) {
+                int objHash = obj.hashCode();
+                // xor with circular bitshift of hash
+                hash ^= (objHash >>> objHash) | (objHash << (32 - offset));
+            }
+        }
+        return hash;
+    }
 }

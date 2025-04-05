@@ -8,6 +8,7 @@ import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.JoinType;
 import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.List;
 import java.util.Set;
@@ -29,7 +30,7 @@ public interface Relation extends Obj {
      * @param aggregator выражение-аггрегатор: возвращаеит новую строку
      * @return сгрупированное отношение
      */
-    Relation group(List<Id> columns, Expression aggregator);
+    Relation group(Set<Id> columns, RowDefinition aggregator);
 
     /**
      * Преобразует строки в другие

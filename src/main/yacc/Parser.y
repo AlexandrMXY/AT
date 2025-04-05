@@ -15,11 +15,17 @@
 %token COMA DOT SEMICOLON SCOPE_OPERATOR ARROW
 %token EQUALS NOT_EQUALS GREATER LESS GREATER_EQ LESS_EQ
 %token OR AND NOT
+%token ADD SUB MUL DIV
 %token ASSIGN
 
 %left COMA
 %right ASSIGN
-%left OR AND NOT
+%left OR
+%left AND
+%left NOT
+%left ADD SUB
+%left MUL DIV
+%left NEG
 %nonassoc EQUALS NOT_EQUALS GREATER LESS GREATER_EQ LESS_EQ
 %left SEMICOLON
 %left DOT
@@ -44,6 +50,12 @@ expr: TRUE      { $$ = new YYParserVal(Bool.TRUE); }
     | STRING    { $$ = new YYParserVal(Str.fromQuotedString($1.sval)); }
     | NULL      { $$ = new YYParserVal((Object)null); }
     | id        { $$ = $1; }
+
+    | expr ADD expr      { $$ = util.fun(Functions.ADD, $1, $3); }
+    | expr SUB expr      { $$ = util.fun(Functions.SUB, $1, $3); }
+    | expr MUL expr      { $$ = util.fun(Functions.MUL, $1, $3); }
+    | expr DIV expr      { $$ = util.fun(Functions.DIV, $1, $3); }
+    | SUB expr %prec NEG { $$ = util.fun(Functions.NEG, $1, $3); }
 
     | expr LESS expr       { $$ = util.fun(Functions.LESS, $1, $3); }
     | expr GREATER expr    { $$ = util.fun(Functions.GREATER, $1, $3); }

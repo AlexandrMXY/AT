@@ -14,7 +14,7 @@ INT_NUM = -?{NUM0}
 FLOAT_NUM = {INT_NUM}\.{NUM0}
 STR = [\"]([^\"\\]|\\\\|\\\")*[\"]
 
-IDENTIFIER = [:letter:][[:letter:][:digit:]_$]*
+IDENTIFIER = ([:letter:]|[_$])[[:letter:][:digit:]_$]*
 
 INDEX = hashtable|tree|ordered
 MODIFIER = primary|unique|notnull
@@ -52,6 +52,11 @@ row { return ROW.instance(); }
 \>= { return GREATER_EQ.instance(); }
 \< { return LESS.instance(); }
 \> { return GREATER.instance(); }
+
+\+ { return ADD.instance(); }
+- { return SUB.instance(); }
+\* { return MUL.instance(); }
+\/ { return DIV.instance(); }
 
 = { return ASSIGN.instance(); }
 \|\| { return OR.instance(); }

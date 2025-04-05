@@ -44,6 +44,11 @@ public enum TokenType {
     AND(YYParser.AND),
     NOT(YYParser.NOT),
 
+    ADD(YYParser.ADD),
+    SUB(YYParser.SUB),
+    MUL(YYParser.MUL),
+    DIV(YYParser.DIV),
+
     ASSIGN(YYParser.ASSIGN);
 
     private final Token instance = new Token(this);

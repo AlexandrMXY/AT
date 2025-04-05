@@ -19,57 +19,53 @@ public class Application {
 
     private static final String q = """
             hashtable relationship A {
-                notnull unique String a;
-                primary Integer b;
-                String c;
-                Boolean d;
-                Unique(c,d);
-            };
-            hashtable relationship B {
-                notnull unique String a;
-                primary Integer b;
-                String c;
-                Boolean d;
-                Unique(c,d);
-                a -> A::a;
+                primary Integer a;
+                Integer b;
+                Integer c;
+                Integer d;
             };
             A.insert(row {
-                a = "sinx";
-                b = 111;
-                c = "dfe";
-                d = 77 < 88 || true;
+                a = 1;
+                b = 1;
+                c = 1;
+                d = 683;
             });
             A.insert(row {
-                a = "sinx1";
-                b = 1111;
-                c = "dfe1";
-                d = 77 < 88 || true;
+                a = 2;
+                b = 1;
+                c = 1;
+                d = 254;
             });
             A.insert(row {
-                a = "sinx11";
-                b = 11111;
-                c = "dfe11";
-                d = 77 < 88 || true;
+                a = 3;
+                b = 1;
+                c = 1;
+                d = 882;
             });
-            B.insert(row {
-                a = "sinx";
-                b = 222;
-                c = "dfe2";
-                d = 77 < 88 || true;
+            A.insert(row {
+                a = 4;
+                b = 2;
+                c = 1;
+                d = 1645;
             });
-            B.insert(row {
-                a = "sinx1";
-                b = 2222;
-                c = "dfe22";
-                d = 77 < 88 || true;
+            A.insert(row {
+                a = 5;
+                b = 2;
+                c = 1;
+                d = 423;
             });
-            B.insert(row {
-                a = "sinx11";
-                b = 22222;
-                c = "dfe222";
-                d = 77 < 88 || true;
+            A.insert(row {
+                a = 6;
+                b = 2;
+                c = 2;
+                d = 123;
             });
-            A.join(B, A::b < B::b);
+            A.group(b, c, row {
+                s = sum(a);
+                s2 = reduce(0, __value + a);
+                s3 = max(d);
+                s4 = min(d);
+            });
             """;
 
 

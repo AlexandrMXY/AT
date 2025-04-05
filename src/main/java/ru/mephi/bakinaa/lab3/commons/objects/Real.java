@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Real extends SimpleObj {
+public class Real extends Num {
     public final double value;
 
     public static Real parse(String str) {

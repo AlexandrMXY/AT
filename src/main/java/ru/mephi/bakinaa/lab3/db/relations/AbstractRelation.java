@@ -10,6 +10,7 @@ import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.db.JoinType;
 import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public abstract class AbstractRelation implements Relation {
     public Obj reduce(Expression initial, Expression reducer) {
         ExpressionContext context = ExpressionContext.create();
 
-        Obj value = initial.call(context);
+        Obj value = initial == null ? null : initial.call(context);
         RowView rowView = first();
         context.setRow(rowView);
 
@@ -99,9 +100,8 @@ public abstract class AbstractRelation implements Relation {
     }
 
     @Override
-    public Relation group(List<Id> columns, Expression aggregator) {
-        // TODO
-        throw new UnsupportedOperationException();
+    public Relation group(Set<Id> columns, RowDefinition aggregator) {
+        return new GroupRelation(this, columns, aggregator);
     }
 
     @Override

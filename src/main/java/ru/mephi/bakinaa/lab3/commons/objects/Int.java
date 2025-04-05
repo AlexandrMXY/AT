@@ -6,7 +6,7 @@ import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 @AllArgsConstructor
 @EqualsAndHashCode
-public class Int extends SimpleObj {
+public class Int extends Num {
     public final long value;
 
     public static Int parse(String str) {
