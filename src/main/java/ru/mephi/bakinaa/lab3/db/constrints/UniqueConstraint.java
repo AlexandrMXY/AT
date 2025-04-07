@@ -2,17 +2,21 @@ package ru.mephi.bakinaa.lab3.db.constrints;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import ru.mephi.bakinaa.lab3.db.core.Row;
-import ru.mephi.bakinaa.lab3.db.core.Table;
+import ru.mephi.bakinaa.lab3.db.relations.rows.Row;
+import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 
 import java.util.*;
 
 @Getter
-@RequiredArgsConstructor
 public class UniqueConstraint extends Constraint {
     protected static final Map<Integer, SimpleObj> EMPTY = Collections.unmodifiableMap(new HashMap<>());
-    protected final List<Integer> cols;
+    protected final Set<Integer> cols;
+
+    public UniqueConstraint(String name, Set<Integer> cols) {
+        super(name);
+        this.cols = cols;
+    }
 
     @Override
     public boolean checkOnInsert(Table table, Row row) {
@@ -50,5 +54,10 @@ public class UniqueConstraint extends Constraint {
                 return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean checkOnColRemove(Table table, int colIndex) {
+        return !cols.contains(colIndex);
     }
 }

@@ -3,10 +3,9 @@ package ru.mephi.bakinaa.lab3.db.relations;
 import ru.mephi.bakinaa.lab3.commons.Expression;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
-import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
-import ru.mephi.bakinaa.lab3.db.JoinType;
-import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
+import ru.mephi.bakinaa.lab3.db.relations.rows.SimpleRowView;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
 import java.util.ArrayList;
@@ -16,6 +15,12 @@ import java.util.Set;
 public class SimpleRelation extends AbstractRelation {
     private final Relation relation;
     private List<Integer> index;
+
+    public SimpleRelation(Relation relation, List<Integer> rows) {
+        super(relation.getDatabase());
+        this.relation = relation;
+        index = rows;
+    }
 
     public SimpleRelation(Relation relation, int skip, int limit, List<Expression> filters) {
         super(relation.getDatabase());
@@ -113,4 +118,10 @@ public class SimpleRelation extends AbstractRelation {
     public Set<Id> getColumnsSet() {
         return relation.getColumnsSet();
     }
+
+    @Override
+    public boolean hasColumn(Id col) {
+        return relation.hasColumn(col);
+    }
+
 }

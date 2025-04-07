@@ -2,15 +2,16 @@ package ru.mephi.bakinaa.lab3.db.relations;
 
 import ru.mephi.bakinaa.lab3.commons.Expression;
 import ru.mephi.bakinaa.lab3.commons.Obj;
+import ru.mephi.bakinaa.lab3.commons.Sort;
 import ru.mephi.bakinaa.lab3.commons.objects.Bool;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.JoinType;
-import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.db.Database;
+import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
-import java.util.List;
 import java.util.Set;
 
 public interface Relation extends Obj {
@@ -20,9 +21,11 @@ public interface Relation extends Obj {
 
     Relation limit(int value);
     Relation skip(int value);
-    Relation project(List<Id> cols);
+    Relation sort(Sort sort);
+    Relation project(Set<Id> cols);
     Relation filter(Expression filter);
     Relation join(Relation other, JoinType type, Expression condition);
+    Relation findBy(RowDefinition definition);
 
     /**
      * Групирует отн по значению столбцов
@@ -37,13 +40,12 @@ public interface Relation extends Obj {
      * @param mapper функция преобразования: возвращает новую ситроку
      * @return преобразованое отношение
      */
-    Relation map(Expression mapper);
+    Relation map(RowDefinition mapper);
 
     Int count();
     Bool isEmpty();
     Bool anyMatch(Expression predicate);
     Bool allMatch(Expression predicate);
-
     Obj reduce(Expression initial, Expression reducer);
 
 
@@ -54,4 +56,5 @@ public interface Relation extends Obj {
 
     SimpleObj get(int rowId, Id columnId);
     Set<Id> getColumnsSet();
+    boolean hasColumn(Id col);
 }

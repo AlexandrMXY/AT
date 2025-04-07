@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.relations;
+package ru.mephi.bakinaa.lab3.db.relations.rows;
 
 import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;

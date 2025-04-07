@@ -1,18 +1,16 @@
-package ru.mephi.bakinaa.lab3.db.context;
+package ru.mephi.bakinaa.lab3.db.registry;
 
 import ru.mephi.bakinaa.lab3.commons.*;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
-import ru.mephi.bakinaa.lab3.commons.objects.Real;
 import ru.mephi.bakinaa.lab3.db.JoinType;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
+import ru.mephi.bakinaa.lab3.lang.defs.ColDefinition;
+import ru.mephi.bakinaa.lab3.lang.defs.Definitions;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DefaultRegistry implements Registry {
     public static final Id REDUCE_ACCUMULATOR_VARIABLE = Relation.REDUCE_ACCUMULATOR_VARIABLE;
@@ -37,16 +35,32 @@ public class DefaultRegistry implements Registry {
             throw new UnsupportedOperationException("Unimplemented");
         }));
         functions.put("addColumns", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            List<ColDefinition> colDefinitions = new ArrayList<>();
+            if (args.length != 2)
+                throw new InvalidDBAccessException("Illegal function call");
+            Definitions definitions = (Definitions) args[1];
+            for (var def : definitions.getDefinitions())
+                colDefinitions.add((ColDefinition) def);
+            ctx.getDatabase().getTable((Id)args[0]).addColumns(colDefinitions);
+            return null;
         }));
         functions.put("editColumn", ((ctx, args) -> {
             throw new UnsupportedOperationException("Unimplemented");
         }));
         functions.put("removeColumn", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            if (args.length != 2)
+                throw new InvalidDBAccessException("Illegal function call");
+            ctx.getDatabase().getTable((Id)args[0]).removeColumns(Set.of((Id) args[1]));
+            return null;
         }));
         functions.put("removeColumns", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            if (args.length < 2)
+                throw new InvalidDBAccessException("Illegal function call");
+            Set<Id> cols = new HashSet<>();
+            for (int i = 1; i < args.length; i++)
+                cols.add((Id) args[i]);
+            ctx.getDatabase().getTable((Id)args[0]).removeColumns(cols);
+            return null;
         }));
         functions.put("deleteConstraint", ((ctx, args) -> {
             throw new UnsupportedOperationException("Unimplemented");
@@ -55,13 +69,19 @@ public class DefaultRegistry implements Registry {
             throw new UnsupportedOperationException("Unimplemented");
         }));
         functions.put("project", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            if (args.length < 2)
+                throw new InvalidDBAccessException("Illegal project function usage");
+            Set<Id> cols = new HashSet<>();
+            for (int i = 1; i < args.length; i++)
+                cols.add((Id) args[i]);
+
+            return relation(ctx, args[0]).project(cols);
         }));
         functions.put("map", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).map((RowDefinition) args[1]);
         }));
         functions.put("sort", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            return relation(ctx, args[0]).sort((Sort) args[1]);
         }));
         functions.put("limit", ((ctx, args) -> {
             return relation(ctx, args[0]).limit(((Int)args[1].call(ctx)).asInt32());
@@ -121,18 +141,32 @@ public class DefaultRegistry implements Registry {
         functions.put("contains", ((ctx, args) -> {
             throw new UnsupportedOperationException("Unimplemented");
         }));
+        functions.put("findIf", ((ctx, args) -> {
+            return relation(ctx, args[0]).filter(args[1]);
+        }));
         functions.put("insert", ((ctx, args) -> {
             ctx.getDatabase().getTable((Id)args[0]).insert((RowDefinition) args[1].call(ctx));
             return null;
         }));
         functions.put("removeIf", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            ctx.getDatabase().getTable((Id)args[0]).removeIf(args[1]);
+            return null;
+        }));
+        functions.put("removeBy", ((ctx, args) -> {
+            ctx.getDatabase().getTable((Id)args[0]).removeBy((RowDefinition) args[1]);
+            return null;
+        }));
+        functions.put("findBy", ((ctx, args) -> {
+            return relation(ctx, args[0]).findBy((RowDefinition) args[1]);
+        }));
+        functions.put("findAll", ((ctx, args) -> {
+            return relation(ctx, args[0]);
         }));
     }
 
     private static Relation relation(ExpressionContext ctx, Expression expression) {
         if (expression instanceof Id id)
             return ctx.getDatabase().getTable(id);
-        return (Relation) expression;
+        return (Relation) expression.call(ctx);
     }
 }

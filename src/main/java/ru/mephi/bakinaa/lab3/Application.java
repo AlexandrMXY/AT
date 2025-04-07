@@ -4,8 +4,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
-import ru.mephi.bakinaa.lab3.db.context.DefaultRegistry;
-import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.db.registry.DefaultRegistry;
+import ru.mephi.bakinaa.lab3.db.Database;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.lang.QueryParser;
 
@@ -13,7 +13,6 @@ import ru.mephi.bakinaa.lab3.lang.QueryParser;
 @Slf4j
 public class Application {
     public static void main(String[] args) {
-        //SpringApplication.run(Application.class, args);
         new Application().init();
     }
 
@@ -23,6 +22,7 @@ public class Application {
                 Integer b;
                 Integer c;
                 Integer d;
+                Unique(d) feq;
             };
             A.insert(row {
                 a = 1;
@@ -60,12 +60,14 @@ public class Application {
                 c = 2;
                 d = 123;
             });
-            A.group(b, c, row {
-                s = sum(a);
-                s2 = reduce(0, __value + a);
-                s3 = max(d);
-                s4 = min(d);
+            
+            A.addColumns({
+                Integer b1;
+                Integer c1;
+                Integer d1;
             });
+            A.removeColumns(b1, c1);
+            A.findAll();
             """;
 
 

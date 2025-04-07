@@ -4,10 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
-import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.db.Database;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
-import ru.mephi.bakinaa.lab3.db.relations.RowView;
-import ru.mephi.bakinaa.lab3.db.relations.SimpleRowView;
+import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 
 import java.util.HashMap;
 import java.util.Map;

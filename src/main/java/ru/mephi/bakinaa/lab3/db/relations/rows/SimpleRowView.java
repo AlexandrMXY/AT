@@ -1,11 +1,11 @@
-package ru.mephi.bakinaa.lab3.db.relations;
+package ru.mephi.bakinaa.lab3.db.relations.rows;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
+import ru.mephi.bakinaa.lab3.db.relations.Relation;
 
 @Getter
 @Setter

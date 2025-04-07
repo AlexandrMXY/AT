@@ -28,6 +28,8 @@ false { return FALSE.instance(); }
 null { return NULL.instance(); }
 relationship { return RELATIONSHIP.instance(); }
 row { return ROW.instance(); }
+asc { return ASC.instance(); }
+desc { return DESC.instance(); }
 {TYPE} { return TYPE_NAME.instance(yytext()); }
 {CONSTRAINT} { return CONSTRAINT.instance(yytext()); }
 {MODIFIER} { return MODIFIER.instance(yytext()); }

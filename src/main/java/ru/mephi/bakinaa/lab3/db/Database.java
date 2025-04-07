@@ -1,18 +1,19 @@
-package ru.mephi.bakinaa.lab3.db.core;
+package ru.mephi.bakinaa.lab3.db;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
+import ru.mephi.bakinaa.lab3.db.relations.Table;
+import ru.mephi.bakinaa.lab3.db.relations.index.MapIndex;
+import ru.mephi.bakinaa.lab3.db.relations.rows.Column;
+import ru.mephi.bakinaa.lab3.db.relations.rows.Columns;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.FunArgs;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.lang.defs.TableDefinition;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Getter
@@ -30,41 +31,40 @@ public class Database {
         return getTable(id.value);
     }
 
+    public void deleteTable(Id id) {
+        if (id.scope != null)
+            throw new InvalidDBAccessException("Invalid id " + id);
+        Table table = tables.get(id.value);
+        if (table == null)
+            throw new InvalidDBAccessException("Unknown table " + id);
+        if (!table.canDelete())
+            throw new InvalidDBAccessException("Table deletion volatiles constraints");
+        tables.remove(id.value);
+    }
+
     public void createTable(TableDefinition definition) {
         Table table = new Table(this, definition.getId().value);
 
-        for (var colDef : definition.getCols()) {
-            Column col = new Column(colDef.getName(), colDef.getType());
-            table.getColumns().registerColumn(col);
+        table.addColumns(definition.getCols());
 
-            for (Modifier modifier : colDef.getModifiers()) {
-                if (modifier == Modifier.NOT_NULL) {
-                    col.setNullable(false);
-                }
-                if (modifier == Modifier.UNIQUE) {
-                    col.setUnique(true);
-                }
-                if (modifier == Modifier.PRIMARY) {
-                    if (table.getPKey() != null)
-                        throw new InvalidDBAccessException("Multiple primary keys");
-                    table.setPKey(List.of(col.getIndex()));
-                }
-            }
-        }
         createUserConstraints(table, definition);
         createModifierConstraint(table);
 
         if (table.getPKey() == null)
             throw new InvalidDBAccessException("Primary key not specified");
+        switch (definition.getIndexType()) {
+            case HASHTABLE -> table.setIndex(MapIndex.createHash());
+            case TREE, ORDERED -> table.setIndex(MapIndex.createTree());
+        }
         tables.put(table.getName(), table);
     }
 
     private void createModifierConstraint(Table table) {
         for (var col : table.getColumns().getColumnsMap().values()) {
             if (col.isUnique())
-                table.addConstraint(new UniqueConstraint(List.of(col.getIndex())));
+                table.addConstraint(new UniqueConstraint(col.getName() + "#unique" , Set.of(col.getIndex())));
             if (!col.isNullable())
-                table.addConstraint(new NotNullConstraint(col.getIndex()));
+                table.addConstraint(new NotNullConstraint(col.getName() + "#notnull", col.getIndex()));
         }
     }
 
@@ -73,8 +73,8 @@ public class Database {
             switch (constrDef.getConstraint()) {
                 case null -> throw new NullPointerException();
                 case UNIQUE -> {
-                    List<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), table);
-                    table.addConstraint(new UniqueConstraint(constraintCols));
+                    Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), table);
+                    table.addConstraint(new UniqueConstraint(constrDef.getId().value, constraintCols));
                 }
                 case PREDICATE -> {
                     // TODO
@@ -101,7 +101,7 @@ public class Database {
                     if (toColumnId < 0)
                         throw new InvalidDBAccessException("Unknown column " + to);
 
-                    Constraint constraint = new ForeignKeyConstraint(table, fromColumnId, targetTable, toColumnId);
+                    Constraint constraint = new ForeignKeyConstraint(constrDef.getId().value, table, fromColumnId, targetTable, toColumnId);
                     table.addConstraint(constraint);
                     targetTable.addConstraint(constraint);
                 }
@@ -109,16 +109,16 @@ public class Database {
                     if (table.getPKey() != null)
                         throw new InvalidDBAccessException("Multiple primary keys");
 
-                    List<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), table);
-                    table.addConstraint(new PrimaryKeyConstraint(constraintCols));
+                    Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), table);
+                    table.addConstraint(new PrimaryKeyConstraint(constrDef.getId().value, constraintCols));
                 }
             }
         }
     }
 
-    private List<Integer> getColumnsIdsFromArg(FunArgs args, Table table) {
+    private Set<Integer> getColumnsIdsFromArg(FunArgs args, Table table) {
         Columns columns = table.getColumns();
-        List<Integer> result = new ArrayList<>();
+        Set<Integer> result = new HashSet<>();
 
         for (var arg : args.getArgs()) {
             if (arg instanceof Id id) {

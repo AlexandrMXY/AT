@@ -3,11 +3,12 @@ package ru.mephi.bakinaa.lab3.db.relations;
 
 import ru.mephi.bakinaa.lab3.commons.Expression;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
+import ru.mephi.bakinaa.lab3.commons.Sort;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.JoinType;
-import ru.mephi.bakinaa.lab3.db.core.Database;
-import ru.mephi.bakinaa.lab3.db.core.Row;
+import ru.mephi.bakinaa.lab3.db.Database;
+import ru.mephi.bakinaa.lab3.db.relations.rows.*;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
@@ -108,6 +109,10 @@ public class GroupRelation extends AbstractRelation {
         return mapping.getColumns();
     }
 
+    @Override
+    public boolean hasColumn(Id col) {
+        return mapping.hasColumns(col);
+    }
 
     private static class Group extends AbstractRelation {
         private final Relation base;
@@ -140,7 +145,7 @@ public class GroupRelation extends AbstractRelation {
         @Override
         public void moveToIndex(RowView view, int index) {
             if (view instanceof SimpleRowView rowView) {
-                ((SimpleRowView) view).setIndex(index);
+                rowView.setIndex(index);
             } else throw new IllegalArgumentException();
         }
 
@@ -171,7 +176,7 @@ public class GroupRelation extends AbstractRelation {
         }
 
         @Override
-        public Relation project(List<Id> cols) {
+        public Relation project(Set<Id> cols) {
             throw new UnsupportedOperationException();
         }
 
@@ -191,8 +196,18 @@ public class GroupRelation extends AbstractRelation {
         }
 
         @Override
-        public Relation map(Expression mapper) {
+        public Relation map(RowDefinition mapper) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Relation sort(Sort sort) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean hasColumn(Id col) {
+            return base.hasColumn(col);
         }
     }
 }

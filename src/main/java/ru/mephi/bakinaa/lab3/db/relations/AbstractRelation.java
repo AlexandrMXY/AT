@@ -5,15 +5,16 @@ import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.Expression;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.Obj;
+import ru.mephi.bakinaa.lab3.commons.Sort;
 import ru.mephi.bakinaa.lab3.commons.objects.Bool;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.db.JoinType;
-import ru.mephi.bakinaa.lab3.db.core.Database;
+import ru.mephi.bakinaa.lab3.db.Database;
+import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,6 +22,11 @@ import java.util.Set;
 @Getter
 public abstract class AbstractRelation implements Relation {
     protected final Database database;
+
+    @Override
+    public Relation sort(Sort sort) {
+        return new SortRelation(this, sort);
+    }
 
     @Override
     public Obj reduce(Expression initial, Expression reducer) {
@@ -94,9 +100,13 @@ public abstract class AbstractRelation implements Relation {
     }
 
     @Override
-    public Relation project(List<Id> cols) {
-        // TODO
-        throw new UnsupportedOperationException();
+    public Relation findBy(RowDefinition definition) {
+        return filter(FunctionUtils.rowDefinitionAsCondition(database, definition));
+    }
+
+    @Override
+    public Relation project(Set<Id> cols) {
+        return new ProjectRelation(this, cols);
     }
 
     @Override
@@ -105,9 +115,8 @@ public abstract class AbstractRelation implements Relation {
     }
 
     @Override
-    public Relation map(Expression mapper) {
-        // TODO
-        throw new UnsupportedOperationException();
+    public Relation map(RowDefinition mapper) {
+        return new MapRelation(this, mapper);
     }
 
 

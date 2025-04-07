@@ -10,7 +10,7 @@
 
 %token INT_NUM FLOAT_NUM STRING TRUE FALSE NULL ID
 %token INDEX_TYPE TYPE_NAME MODIFIER CONSTRAINT
-%token RELATIONSHIP ROW
+%token RELATIONSHIP ROW ASC DESC
 %token PAR_OPEN PAR_CLOSE SQUARE_BR_OPEN SQUARE_BR_CLOSE CUR_BR_OPEN CUR_BR_CLOSE
 %token COMA DOT SEMICOLON SCOPE_OPERATOR ARROW
 %token EQUALS NOT_EQUALS GREATER LESS GREATER_EQ LESS_EQ
@@ -72,10 +72,17 @@ expr: TRUE      { $$ = new YYParserVal(Bool.TRUE); }
     | PAR_OPEN expr PAR_CLOSE             { $$ = $2; }
     | id PAR_OPEN args PAR_CLOSE          { $$ = util.fun($1, (FunArgs)$3.obj); }
     | expr DOT id PAR_OPEN args PAR_CLOSE { $$ = util.fun($3, $1, (FunArgs)$5.obj); }
+    | id PAR_OPEN PAR_CLOSE               { $$ = util.fun($1, new FunArgs()); }
+    | expr DOT id PAR_OPEN PAR_CLOSE      { $$ = util.fun($3, $1, new FunArgs()); }
 
 args: exprs { $$ = $1; }
 exprs: expr             { $$ = new YYParserVal(new FunArgs((Expression)$1.obj)); }
+    | definitionsGroup  { $$ = new YYParserVal(new FunArgs((Expression)$1.obj)); }
+    | sortOrder         { $$ = new YYParserVal(new FunArgs((Expression)$1.obj)); }
     | exprs COMA exprs  { $$ = new YYParserVal(((FunArgs)$1.obj).addAll((FunArgs)$3.obj)); }
+
+sortOrder: ASC id { $$ = new YYParserVal(new Sort(Sort.Order.ASC, (Id)$2.obj)); }
+    | DESC id { $$ = new YYParserVal(new Sort(Sort.Order.DESC, (Id)$2.obj)); }
 
 id: ID { $$ = new YYParserVal(new Id($1.sval)); }
     | ID SCOPE_OPERATOR ID { $$ = new YYParserVal(new Id($1.sval, $3.sval)); }
@@ -83,8 +90,8 @@ id: ID { $$ = new YYParserVal(new Id($1.sval)); }
 colDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, (Id)$2.obj)); }
     | MODIFIER colDef { ((ColDefinition)$2.obj).addModifier(Modifier.parse($1.sval)); $$ = $2; }
 
-constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (FunArgs)$3.obj)); }
-    | id ARROW id { $$ = new YYParserVal(ConstraintDefinition.foreignKey((Id)$1.obj, (Id)$3.obj)); }
+constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE id { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (FunArgs)$3.obj, (Id)$5.obj)); }
+    | id ARROW id id { $$ = new YYParserVal(ConstraintDefinition.foreignKey((Id)$1.obj, (Id)$3.obj, (Id)$4.obj)); }
 
 tableDef: INDEX_TYPE RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$4.obj, (Id)$3.obj)); }
     | RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$3.obj, (Id)$2.obj)); }

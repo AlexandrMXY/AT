@@ -1,8 +1,7 @@
-package ru.mephi.bakinaa.lab3.db.core;
+package ru.mephi.bakinaa.lab3.db.relations.rows;
 
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
-import ru.mephi.bakinaa.lab3.db.relations.RowMapping;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.HashMap;
@@ -16,6 +15,13 @@ public class Columns implements RowMapping {
     private final Map<String, Column> columns = new HashMap<>();
     private final Map<Integer, Column> columnIndexesMap = new HashMap<>();
     private final Set<Id> columnsSet = new HashSet<>();
+
+    public void removeColumn(String col) {
+        Column column = columns.get(col);
+        columns.remove(col);
+        columnIndexesMap.remove(column.getIndex());
+        columnsSet.remove(new Id(tableName, column.getName()));
+    }
 
     public void registerColumn(Column column) {
         if (columns.containsKey(column.getName()))
@@ -84,5 +90,8 @@ public class Columns implements RowMapping {
         return columnsSet;
     }
 
-
+    @Override
+    public boolean hasColumns(Id id) {
+        return (id.scope == null || id.scope.equals(tableName)) && columns.containsKey(id.value);
+    }
 }

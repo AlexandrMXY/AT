@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.utils;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.*;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
-import ru.mephi.bakinaa.lab3.db.context.Registry;
+import ru.mephi.bakinaa.lab3.db.registry.Registry;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.lang.FunArgs;
 import ru.mephi.bakinaa.lab3.lang.YYParserVal;

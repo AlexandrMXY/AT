@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.core;
+package ru.mephi.bakinaa.lab3.db.relations.rows;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

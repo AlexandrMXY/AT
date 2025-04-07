@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.core;
+package ru.mephi.bakinaa.lab3.db.relations.rows;
 
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
@@ -6,6 +6,7 @@ import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class Row {
     private final List<SimpleObj> data = new ArrayList<>();
@@ -28,11 +29,11 @@ public class Row {
         data.set(index, val);
     }
 
-    public int hash(List<Integer> cols) {
+    public int hash(Set<Integer> cols) {
         return cols.stream().map(i -> Objects.hashCode(get(i))).reduce(0, (a, b) -> a ^ b);
     }
 
-    public boolean equals(Row other, List<Integer> cols) {
+    public boolean equals(Row other, Set<Integer> cols) {
         for (int i : cols)
             if (!Objects.equals(this.get(i), other.get(i)))
                 return false;

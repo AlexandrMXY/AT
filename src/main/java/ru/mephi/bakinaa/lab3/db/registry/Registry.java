@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.db.context;
+package ru.mephi.bakinaa.lab3.db.registry;
 
 import ru.mephi.bakinaa.lab3.commons.Fun;
 

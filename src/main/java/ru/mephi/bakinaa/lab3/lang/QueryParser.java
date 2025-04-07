@@ -3,7 +3,7 @@ package ru.mephi.bakinaa.lab3.lang;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import ru.mephi.bakinaa.lab3.commons.Expressions;
-import ru.mephi.bakinaa.lab3.db.context.Registry;
+import ru.mephi.bakinaa.lab3.db.registry.Registry;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
 import ru.mephi.bakinaa.lab3.utils.GVUtils;
 import ru.mephi.bakinaa.lab3.utils.ParserUtils;

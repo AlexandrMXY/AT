@@ -1,14 +1,17 @@
 package ru.mephi.bakinaa.lab3.lang;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.Expression;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
+@NoArgsConstructor
 public class FunArgs {
-    @Getter
-    private List<Expression> args = new ArrayList<>();
+    private final List<Expression> args = new ArrayList<>();
+
 
     public FunArgs(Expression expr) {
         this.args.add(expr);

@@ -6,6 +6,9 @@ import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.JoinType;
+import ru.mephi.bakinaa.lab3.db.relations.rows.JoinRowView;
+import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
+import ru.mephi.bakinaa.lab3.db.relations.rows.SimpleRowMapping;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
@@ -14,8 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 public class Join extends AbstractRelation {
-    static final int LEFT_MAPPING_ID = 0;
-    static final int RIGHT_MAPPING_ID = 1;
+    public static final int LEFT_MAPPING_ID = 0;
+    public static final int RIGHT_MAPPING_ID = 1;
 
     private final Relation left;
     private final Relation right;
@@ -116,5 +119,10 @@ public class Join extends AbstractRelation {
     @Override
     public Set<Id> getColumnsSet() {
         return mapping.getColumns();
+    }
+
+    @Override
+    public boolean hasColumn(Id col) {
+        return mapping.hasColumns(col);
     }
 }

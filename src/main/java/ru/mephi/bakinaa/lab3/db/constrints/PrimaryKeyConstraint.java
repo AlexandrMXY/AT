@@ -1,15 +1,16 @@
 package ru.mephi.bakinaa.lab3.db.constrints;
 
-import ru.mephi.bakinaa.lab3.db.core.Row;
-import ru.mephi.bakinaa.lab3.db.core.Table;
+import ru.mephi.bakinaa.lab3.db.relations.rows.Row;
+import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class PrimaryKeyConstraint extends UniqueConstraint {
-    public PrimaryKeyConstraint(List<Integer> cols) {
-        super(cols);
+    public PrimaryKeyConstraint(String name, Set<Integer> cols) {
+        super(name, cols);
     }
 
     @Override
@@ -28,4 +29,5 @@ public class PrimaryKeyConstraint extends UniqueConstraint {
                 return true;
         return false;
     }
+
 }

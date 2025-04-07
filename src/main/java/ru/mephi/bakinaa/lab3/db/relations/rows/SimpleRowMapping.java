@@ -1,10 +1,9 @@
-package ru.mephi.bakinaa.lab3.db.relations;
+package ru.mephi.bakinaa.lab3.db.relations.rows;
 
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -39,5 +38,10 @@ public class SimpleRowMapping implements RowMapping {
     @Override
     public Set<Id> getColumns() {
         return mapping.keySet();
+    }
+
+    @Override
+    public boolean hasColumns(Id id) {
+        return id.scope == null ? inaccurateMapping.containsKey(id.value) : mapping.containsKey(id);
     }
 }

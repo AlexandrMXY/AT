@@ -49,6 +49,9 @@ public enum TokenType {
     MUL(YYParser.MUL),
     DIV(YYParser.DIV),
 
+    ASC(YYParser.ASC),
+    DESC(YYParser.DESC),
+
     ASSIGN(YYParser.ASSIGN);
 
     private final Token instance = new Token(this);
