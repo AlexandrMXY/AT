@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class PrimaryKeyConstraint extends UniqueConstraint {
-    public PrimaryKeyConstraint(String name, Set<Integer> cols) {
-        super(name, cols);
+    public PrimaryKeyConstraint(String name, Table table, Set<Integer> cols) {
+        super(name, table, cols);
     }
 
     @Override
@@ -30,4 +30,9 @@ public class PrimaryKeyConstraint extends UniqueConstraint {
         return false;
     }
 
+    @Override
+    public void remove() {
+        table.forceRemovePKey();
+        super.remove();
+    }
 }

@@ -58,4 +58,10 @@ public class ForeignKeyConstraint extends Constraint {
     public boolean checkOnTableRemove(Table table) {
         return table != fromTable && table != toTable;
     }
+
+    @Override
+    public void remove() {
+        fromTable.forceRemoveConstraint(getName());
+        toTable.forceRemoveConstraint(getName());
+    }
 }

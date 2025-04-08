@@ -1,17 +1,21 @@
 package ru.mephi.bakinaa.lab3.db.registry;
 
+import org.springframework.stereotype.Component;
 import ru.mephi.bakinaa.lab3.commons.*;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.db.JoinType;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
+import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.defs.ColDefinition;
+import ru.mephi.bakinaa.lab3.lang.defs.ConstraintDefinition;
 import ru.mephi.bakinaa.lab3.lang.defs.Definitions;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.*;
 
+@Component
 public class DefaultRegistry implements Registry {
     public static final Id REDUCE_ACCUMULATOR_VARIABLE = Relation.REDUCE_ACCUMULATOR_VARIABLE;
     private final Map<String, Fun<?>> functions = new HashMap<>();
@@ -23,16 +27,30 @@ public class DefaultRegistry implements Registry {
 
     {
         functions.put("createDatabase", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            Id id = (Id)args[0];
+            if (id.scope != null)
+                throw new InvalidDBAccessException("Illegal database name");
+            ctx.getDatabaseService().createDatabase(id.value);
+            return null;
         }));
         functions.put("deleteDatabase", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            Id id = (Id)args[0];
+            if (id.scope != null)
+                throw new InvalidDBAccessException("Illegal database name");
+            ctx.getDatabaseService().removeDatabase(id.value);
+            return null;
         }));
         functions.put("addConstraint", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            Table table = ctx.getDatabase().getTable((Id)args[0]);
+            Definitions definitions = (Definitions) args[1];
+            if (definitions.getDefinitions().size() != 1)
+                throw new InvalidDBAccessException("Illegal function call");
+            ConstraintDefinition constraintDefinition = (ConstraintDefinition) definitions.getDefinitions().getFirst();
+            table.addConstraint(constraintDefinition);
+            return null;
         }));
         functions.put("addForeignKey", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            throw new UnsupportedOperationException("Use addConstraint instead");
         }));
         functions.put("addColumns", ((ctx, args) -> {
             List<ColDefinition> colDefinitions = new ArrayList<>();
@@ -45,7 +63,16 @@ public class DefaultRegistry implements Registry {
             return null;
         }));
         functions.put("editColumn", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            Table table = ctx.getDatabase().getTable((Id)args[0]);
+            Id colName = (Id) args[1];
+            if (colName.scope != null)
+                throw new InvalidDBAccessException("Illegal col id");
+            Definitions definitions = (Definitions) args[2];
+            if (definitions.getDefinitions().size() != 1)
+                throw new InvalidDBAccessException("Illegal function call");
+            ColDefinition colDefinition = (ColDefinition) definitions.getDefinitions().getFirst();
+            table.editColumn(colName.value, colDefinition);
+            return null;
         }));
         functions.put("removeColumn", ((ctx, args) -> {
             if (args.length != 2)
@@ -63,10 +90,21 @@ public class DefaultRegistry implements Registry {
             return null;
         }));
         functions.put("deleteConstraint", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            Table table = ctx.getDatabase().getTable((Id)args[0]);
+            Id constaintId = (Id) args[1];
+            if (constaintId.scope != null)
+                throw new InvalidDBAccessException("Illegal constraint name");
+            table.removeConstraint(constaintId.value);
+            return null;
+        }));
+        functions.put("deletePrimary", ((ctx, args) -> {
+            Table table = ctx.getDatabase().getTable((Id)args[0]);
+            table.removePKey();
+            return null;
         }));
         functions.put("deleteRelationship", ((ctx, args) -> {
-            throw new UnsupportedOperationException("Unimplemented");
+            ctx.getDatabase().deleteTable((Id)args[0]);
+            return null;
         }));
         functions.put("project", ((ctx, args) -> {
             if (args.length < 2)

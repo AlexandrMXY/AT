@@ -14,7 +14,9 @@ import ru.mephi.bakinaa.lab3.db.relations.rows.Row;
 import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.db.relations.rows.SimpleRowView;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
+import ru.mephi.bakinaa.lab3.lang.FunArgs;
 import ru.mephi.bakinaa.lab3.lang.defs.ColDefinition;
+import ru.mephi.bakinaa.lab3.lang.defs.ConstraintDefinition;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
@@ -32,9 +34,10 @@ public class Table extends AbstractRelation {
     private final List<Row> rows = new ArrayList<>();
 
     private Set<Integer> pKey;
-    private Map<String, Integer> keyRowToKeyTupleIndex = new HashMap<>();
+    private Map<String, Integer>  keyRowToKeyTupleIndex = new HashMap<>();
     private Map<Integer, Integer> rowIndexToKeyIndexMap = new HashMap<>();
     private Index index;
+    private Constraint pKeyConstraint = null;
 
     public Table(Database database, String name) {
         super(database);
@@ -42,26 +45,99 @@ public class Table extends AbstractRelation {
         columns = new Columns(name);
     }
 
+    /**
+     * Удаляет ограничение по имени, не вызывая Constraint.remove();
+     * @param constraintName имя
+     */
+    public void forceRemoveConstraint(String constraintName) {
+        constraints.remove(constraintName);
+    }
+
+    /**
+     * Удаляет первиный ключ не вызывая Constraint.remove() для соответствующего ему ограничения
+     */
+    public void forceRemovePKey() {
+        pKey = null;
+        keyRowToKeyTupleIndex = null;
+        rowIndexToKeyIndexMap = null;
+        index = null;
+        pKeyConstraint = null;
+    }
+
+    public void removeConstraint(String name) {
+        if (!constraints.containsKey(name))
+            throw new InvalidDBAccessException("Unknown constraint");
+        constraints.get(name).remove();
+    }
+
+    public boolean hasPKey() {
+        return pKey != null;
+    }
+
+    public void editColumn(String columnName, ColDefinition newDefinition) {
+        Column col = columns.getColumn(columnName);
+        if (col == null)
+            throw new InvalidDBAccessException("Column not found");
+        boolean notnull = false;
+        boolean unique = false;
+        boolean primary = false;
+        for (var modifier : newDefinition.getModifiers()) {
+            switch (modifier) {
+                case NOT_NULL -> notnull = true;
+                case UNIQUE   -> unique = true;
+                case PRIMARY  -> primary = true;
+            }
+        }
+        if (newDefinition.getType() != col.getType() && !rows.isEmpty())
+            throw new InvalidDBAccessException("Unable to change type of col in not empty table");
+        if (primary && hasPKey() && !Set.of(col.getIndex()).equals(pKey))
+            throw new InvalidDBAccessException("Primary key already exists");
+        if (((notnull && col.isNullable()) || (unique && !col.isNullable())) && !rows.isEmpty())
+            throw new InvalidDBAccessException("Unable to add unique/notnull constrain for not empty table");
+        if (primary && !hasPKey() && !rows.isEmpty())
+            throw new InvalidDBAccessException("Unable to add primary key to not empty table");
+        columns.renameColumn(col.getName(), newDefinition.getName());
+        col.setNullable(!notnull);
+        col.setUnique(unique);
+        col.setType(newDefinition.getType());
+        if (primary && !hasPKey())
+            setPKey(Set.of(col.getIndex()));
+    }
+
+    public void removePKey() {
+        if (!hasPKey())
+            throw new InvalidDBAccessException("Unable to remove primary key: primary key not found");
+        pKeyConstraint.remove();
+    }
+
     public void setPKey(Set<Integer> pKeyCols) {
         if (pKey != null)
             throw new InvalidDBAccessException("Primary key already exists");
         pKey = pKeyCols;
+        keyRowToKeyTupleIndex = new HashMap<>();
+        rowIndexToKeyIndexMap = new HashMap<>();
         int keyTupleIndex = 0;
         for (var i : pKeyCols) {
             keyRowToKeyTupleIndex.put(columns.getColumn(i).getName(), keyTupleIndex);
             rowIndexToKeyIndexMap.put(i, keyTupleIndex);
             keyTupleIndex++;
         }
-        addConstraint(new PrimaryKeyConstraint("#primary", pKeyCols));
+        var constraint = new PrimaryKeyConstraint("#primary", this, pKeyCols);
+        pKeyConstraint = constraint;
+        addConstraint(constraint);
     }
 
     public void setIndex(Index index) {
+        if (pKey == null)
+            throw new InvalidDBAccessException("Unable to create index on table without primary key");
         this.index = index;
         for (int i = 0; i < rows.size(); i++)
             index.save(getKeyTuple(rows.get(i)), i);
     }
 
     public void addConstraint(Constraint constraint) {
+        if (!rows.isEmpty())
+            throw new InvalidDBAccessException("Unable to add constraint to not empty table");
         if (constraints.containsKey(constraint.getName()))
             throw new InvalidDBAccessException("Constraint with given name already exists");
         constraints.put(constraint.getName(), constraint);
@@ -77,7 +153,7 @@ public class Table extends AbstractRelation {
             names.add(definition.getName());
         }
         for (var definition : definitions) {
-            Column col = new Column(definition.getName(), definition.getType());
+            Column col = new Column(this, definition.getName(), definition.getType());
             getColumns().registerColumn(col);
 
             for (Modifier modifier : definition.getModifiers()) {
@@ -321,6 +397,71 @@ public class Table extends AbstractRelation {
     @Override
     public boolean hasColumn(Id col) {
         return columns.hasColumns(col);
+    }
+
+    public void addConstraint(ConstraintDefinition constrDef) {
+        switch (constrDef.getConstraint()) {
+            case null -> throw new NullPointerException();
+            case UNIQUE -> {
+                Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), this);
+                this.addConstraint(new UniqueConstraint(constrDef.getId().value, this, constraintCols));
+            }
+            case PREDICATE -> {
+                // TODO
+                throw new UnsupportedOperationException();
+            }
+            case FOREIGN_KEY -> {
+                if (constrDef.getArgs().getArgs().size() != 2)
+                    throw new IllegalArgumentException();
+                Id from = (Id) constrDef.getArgs().getArgs().get(0);
+                Id to = (Id) constrDef.getArgs().getArgs().get(1);
+
+                if (from.scope != null)
+                    throw new InvalidDBAccessException("Illegal id");
+                if (to.scope == null)
+                    throw new InvalidDBAccessException("Target table not specified");
+                Table targetTable = database.getTable(to.scope);
+                if (targetTable == null)
+                    throw new InvalidDBAccessException("Unknown table " + to.scope);
+
+                int fromColumnId = this.getColumns().getIndex(from.value);
+                if (fromColumnId < 0)
+                    throw new InvalidDBAccessException("Unknown column " + from.value);
+                int toColumnId = targetTable.getColumns().getIndex(to.value);
+                if (toColumnId < 0)
+                    throw new InvalidDBAccessException("Unknown column " + to);
+
+                Constraint constraint = new ForeignKeyConstraint(constrDef.getId().value, this, fromColumnId, targetTable, toColumnId);
+                this.addConstraint(constraint);
+                targetTable.addConstraint(constraint);
+            }
+            case PRIMARY_KEY -> {
+                if (this.getPKey() != null)
+                    throw new InvalidDBAccessException("Multiple primary keys");
+
+                Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), this);
+                this.addConstraint(new PrimaryKeyConstraint(constrDef.getId().value, this, constraintCols));
+            }
+        }
+
+    }
+
+    private Set<Integer> getColumnsIdsFromArg(FunArgs args, Table table) {
+        Columns columns = table.getColumns();
+        Set<Integer> result = new HashSet<>();
+
+        for (var arg : args.getArgs()) {
+            if (arg instanceof Id id) {
+                if (id.scope != null)
+                    throw new InvalidDBAccessException("Illegal id");
+                int colIndex = columns.getIndex(id.value);
+                if (colIndex < 0)
+                    throw new InvalidDBAccessException("Unknown column " + id.value);
+                result.add(colIndex);
+            } else throw new IllegalArgumentException("Ids expected as args of constraint");
+        }
+
+        return result;
     }
 
 }

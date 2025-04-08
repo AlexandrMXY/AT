@@ -23,6 +23,22 @@ public class Columns implements RowMapping {
         columnsSet.remove(new Id(tableName, column.getName()));
     }
 
+    public void renameColumn(String originalName, String newName) {
+        Column column = columns.get(originalName);
+        if (column == null)
+            throw new InvalidDBAccessException("Unknown column " + originalName);
+        if (originalName.equals(newName))
+            return;
+        if (columns.containsKey(newName))
+            throw new InvalidDBAccessException("Column with name " + newName + " already exists");
+
+        columnsSet.remove(new Id(tableName, newName));
+        columns.put(newName, column);
+        columnsSet.remove(new Id(tableName, originalName));
+        columns.remove(originalName);
+        column.setName(newName);
+    }
+
     public void registerColumn(Column column) {
         if (columns.containsKey(column.getName()))
             throw new InvalidDBAccessException("Column with name " + column.getName() + " already exists");
@@ -58,12 +74,10 @@ public class Columns implements RowMapping {
         StringBuilder builder = new StringBuilder();
 
         columns.forEach((name, col) -> {
-            builder.append("\t");
+            builder.append("\t").append(col.getType()).append(" ");
             builder.append(name).append(" ").append(col.getIndex());
             if (!col.isNullable())
                 builder.append(" notnull");
-            if (col.isPrimary())
-                builder.append(" primary");
             if (col.isUnique())
                 builder.append(" unique");
             builder.append("\n");

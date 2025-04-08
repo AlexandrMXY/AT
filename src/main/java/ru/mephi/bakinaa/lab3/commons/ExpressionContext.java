@@ -7,6 +7,7 @@ import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.db.Database;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
+import ru.mephi.bakinaa.lab3.service.DatabaseService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 public class ExpressionContext {
+    private DatabaseService databaseService;
     private Database database;
     private Relation relation;
     @Setter
@@ -25,16 +27,19 @@ public class ExpressionContext {
     }
 
     public static ExpressionContext create(Relation relation) {
-        return new ExpressionContext(relation.getDatabase(), relation, null, null);
+        return new ExpressionContext(null, relation.getDatabase(), relation, null, null);
     }
     public static ExpressionContext create(Database db) {
         return create(db, null);
     }
     public static ExpressionContext create(Database db, RowView row) {
-        return new ExpressionContext(db, null, row, new HashMap<>());
+        return new ExpressionContext(null, db, null, row, new HashMap<>());
     }
     public static ExpressionContext create() {
         return create(null, null);
+    }
+    public static ExpressionContext create(DatabaseService service) {
+        return new ExpressionContext(service, null, null, null, new HashMap<>());
     }
 
     public void setValue(Id id, Obj value) {

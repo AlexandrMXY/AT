@@ -10,10 +10,12 @@ import java.util.Map;
 
 @Getter
 public class NotNullConstraint extends Constraint {
+    private final Table table;
     private final int rowIndex;
 
-    public NotNullConstraint(String name, int rowIndex) {
+    public NotNullConstraint(String name, Table table, int rowIndex) {
         super(name);
+        this.table = table;
         this.rowIndex = rowIndex;
     }
 
@@ -25,5 +27,10 @@ public class NotNullConstraint extends Constraint {
     @Override
     public boolean checkOnModify(Table table, Row row, Map<Integer, SimpleObj> updates) {
         return !updates.containsKey(rowIndex) || updates.get(rowIndex) != null;
+    }
+
+    @Override
+    public void remove() {
+        table.forceRemoveConstraint(getName());
     }
 }

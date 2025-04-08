@@ -11,10 +11,12 @@ import java.util.*;
 @Getter
 public class UniqueConstraint extends Constraint {
     protected static final Map<Integer, SimpleObj> EMPTY = Collections.unmodifiableMap(new HashMap<>());
+    protected final Table table;
     protected final Set<Integer> cols;
 
-    public UniqueConstraint(String name, Set<Integer> cols) {
+    public UniqueConstraint(String name, Table table, Set<Integer> cols) {
         super(name);
+        this.table = table;
         this.cols = cols;
     }
 
@@ -59,5 +61,10 @@ public class UniqueConstraint extends Constraint {
     @Override
     public boolean checkOnColRemove(Table table, int colIndex) {
         return !cols.contains(colIndex);
+    }
+
+    @Override
+    public void remove() {
+        table.forceRemoveConstraint(getName());
     }
 }

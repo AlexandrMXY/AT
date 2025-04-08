@@ -2,6 +2,7 @@ package ru.mephi.bakinaa.lab3;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.db.registry.DefaultRegistry;
@@ -13,7 +14,8 @@ import ru.mephi.bakinaa.lab3.lang.QueryParser;
 @Slf4j
 public class Application {
     public static void main(String[] args) {
-        new Application().init();
+        SpringApplication.run(Application.class);
+//        new Application().init();
     }
 
     private static final String q = """
@@ -66,12 +68,19 @@ public class Application {
                 Integer c1;
                 Integer d1;
             });
-            A.removeColumns(b1, c1);
+            A.removeIf(true);
+            A.addConstraint({
+                Unique(b1, c1) unC;
+            });
+            A.editColumn(b1, {
+                notnull unique Boolean bb1;
+            });
+            A.removeColumn(a);
             A.findAll();
             """;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         var query = new QueryParser(q, new DefaultRegistry()).parse();
         Database database = new Database("db");
@@ -81,45 +90,5 @@ public class Application {
         System.out.println(database);
 
         System.out.println(rel);
-
-
-//        Database database = new Database("db");
-//        for (var statement : ((Statements)res).getStatements()) {
-//            database.createTable((TableDefinition) statement);
-//        }
-//
-//        System.out.println(database);
-//
-//        Table A = database.getTable("A");
-//        for (int i = 0; i < 20; i++) {
-//            A.insert(MapBuilder.<String, SimpleObj>builder()
-//                    .put("a", new Str("a" + i))
-//                    .put("b", new Int(i))
-//                    .put("c", new Str("c" + i))
-//                    .build());
-//        }
-//        Table B = database.getTable("B");
-//        for (int i = 0; i < 20; i++) {
-//            B.insert(MapBuilder.<String, SimpleObj>builder()
-//                    .put("a", new Str("a" + i))
-//                    .put("b", new Int(-i))
-//                    .put("c", new Str("c" + i))
-//                    .build());
-//        }
-//
-//        TablesView tableView = new TablesView();
-//        tableView.join(A, JoinType.INNER, Condition.TRUE_CONDITION);
-//        tableView.join(B, JoinType.FULL, (table, row) -> {
-//            return Objects.equals(row.get(new Id("A", "a")), (row.get(new Id("B", "a")))) &&
-//                    ((Int)row.get(new Id("A", "b"))).value % 2 == 0;
-//        });
-//
-////        RowView row = tableView.first();
-////        while (row != null) {
-////            System.out.println(row);
-////            row = tableView.next(row);
-////        }
-//        tableView.limit(5);
-//        System.out.println(tableView.getResult().toString());
     }
 }

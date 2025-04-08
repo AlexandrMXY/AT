@@ -18,4 +18,6 @@ public abstract class Constraint {
     public boolean checkOnModify(Table table, Row row, Map<Integer, SimpleObj> updates) { return true; }
     public boolean checkOnColRemove(Table table, int colIndex) { return true; }
     public boolean checkOnTableRemove(Table table) { return true; }
+
+    public abstract void remove();
 }
