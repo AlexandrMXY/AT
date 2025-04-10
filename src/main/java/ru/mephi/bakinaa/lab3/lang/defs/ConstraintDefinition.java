@@ -26,6 +26,7 @@ public class ConstraintDefinition implements Definition {
             case "Unique" -> new ConstraintDefinition(Constraints.UNIQUE, id, args);
             case "Primary" -> new ConstraintDefinition(Constraints.PRIMARY_KEY, id, args);
             case "Predicate" -> new ConstraintDefinition(Constraints.PREDICATE, id, args);
+            case "Foreign" -> new ConstraintDefinition(Constraints.FOREIGN_KEY, id, args);
 
             default -> throw new LangException("Unknown constraint " + str);
         };
@@ -34,4 +35,5 @@ public class ConstraintDefinition implements Definition {
     public static ConstraintDefinition foreignKey(Id from, Id to, Id constraintId) {
         return new ConstraintDefinition(Constraints.FOREIGN_KEY, constraintId, new FunArgs(from).add(to));
     }
+
 }

@@ -20,5 +20,6 @@ public abstract class Constraint {
     public boolean checkOnColRemove(Table table, int colIndex) { return true; }
     public boolean checkOnTableRemove(Table table) { return true; }
 
+    public boolean canRemove() { return true; }
     public abstract void remove();
 }

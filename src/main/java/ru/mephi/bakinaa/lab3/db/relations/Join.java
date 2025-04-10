@@ -13,6 +13,7 @@ import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
 
@@ -60,18 +61,37 @@ public class Join extends AbstractRelation {
 
         JoinRowView rowView = new JoinRowView(this, null, null);
         ExpressionContext context = ExpressionContext.create(database, rowView);
-        for (int leftIndex = type.leftNullable ? -1 : 0; leftIndex < this.left.getSize(); leftIndex++) {
-            for (int rightIndex = type.rightNullable ? -1 : 0; rightIndex < this.right.getSize(); rightIndex++) {
-                rowView.setLeft(leftIndex == -1 ? null : this.left.getByIndex(leftIndex));
-                rowView.setRight(rightIndex == -1 ? null : this.right.getByIndex(rightIndex));
+        BitSet rightJoined = new BitSet(right.getSize());
+        for (int leftIndex = 0; leftIndex < this.left.getSize(); leftIndex++) {
+            boolean leftJoined = false;
+
+            for (int rightIndex = 0; rightIndex < this.right.getSize(); rightIndex++) {
+                rowView.setLeft(this.left.getByIndex(leftIndex));
+                rowView.setRight(this.right.getByIndex(rightIndex));
                 if (FunctionUtils.checkPredicate(context, condition)) {
                     this.leftIndex.add(leftIndex);
                     this.rightIndex.add(rightIndex);
-
+                    leftJoined = true;
+                    rightJoined.set(rightIndex, true);
                     size++;
                 }
             }
+
+            if (!leftJoined && type.rightNullable) {
+                this.leftIndex.add(leftIndex);
+                this.rightIndex.add(-1);
+                size++;
+            }
         }
+
+        if (type.leftNullable)
+            for (int i = 0; i < right.getSize(); i++) {
+                if (rightJoined.get(i))
+                    continue;
+                this.leftIndex.add(-1);
+                this.rightIndex.add(i);
+                size++;
+            }
     }
 
 

@@ -149,10 +149,10 @@ public class DefaultRegistry implements Registry {
             RowDefinition aggregator = (RowDefinition) args[args.length - 1];
             return rel.group(cols, aggregator);
         }));
-        functions.put("min", ((ctx, args) -> {
+        functions.put("min", ((ctx, args) -> { // TODO fix
             return ctx.getRelation().reduce(null, new FunCall<>(Functions.MIN, REDUCE_ACCUMULATOR_VARIABLE, (Id)args[0]));
         }));
-        functions.put("max", ((ctx, args) -> {
+        functions.put("max", ((ctx, args) -> { // TODO fix
             return ctx.getRelation().reduce(null, new FunCall<>(Functions.MAX, REDUCE_ACCUMULATOR_VARIABLE, (Id)args[0]));
         }));
         functions.put("sum", ((ctx, args) -> {

@@ -4,13 +4,24 @@ import ru.mephi.bakinaa.lab3.db.relations.rows.Row;
 import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class PrimaryKeyConstraint extends UniqueConstraint {
+    private final List<ForeignConstraint> references = new ArrayList<>();
+
     public PrimaryKeyConstraint(String name, Table table, Set<Integer> cols) {
         super(name, table, cols);
+    }
+
+    public void addReference(ForeignConstraint constraint) {
+        references.add(constraint);
+    }
+
+    public void removeReference(ForeignConstraint constraint) {
+        references.remove(constraint);
     }
 
     @Override
@@ -28,6 +39,11 @@ public class PrimaryKeyConstraint extends UniqueConstraint {
             if (updates.getOrDefault(i, row.get(i)) != null)
                 return true;
         return false;
+    }
+
+    @Override
+    public boolean canRemove() {
+        return references.isEmpty();
     }
 
     @Override

@@ -18,7 +18,7 @@ IDENTIFIER = ([:letter:]|[_$])[[:letter:][:digit:]_$]*
 
 INDEX = hashtable|tree|ordered
 MODIFIER = primary|unique|notnull
-CONSTRAINT = Unique|Primary|Predicate
+CONSTRAINT = Unique|Primary|Predicate|Foreign
 TYPE = String|Boolean|Integer|Real
 
 %%

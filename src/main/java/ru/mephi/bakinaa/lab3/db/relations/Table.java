@@ -16,9 +16,7 @@ import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.db.relations.rows.SimpleRowView;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.FunArgs;
-import ru.mephi.bakinaa.lab3.lang.defs.ColDefinition;
-import ru.mephi.bakinaa.lab3.lang.defs.ConstraintDefinition;
-import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
+import ru.mephi.bakinaa.lab3.lang.defs.*;
 import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 import ru.mephi.bakinaa.lab3.utils.Tuple;
@@ -43,7 +41,7 @@ public class Table extends AbstractRelation {
     @JsonIgnore
     private Index index;
     @JsonIgnore
-    private Constraint pKeyConstraint = null;
+    private PrimaryKeyConstraint pKeyConstraint = null;
 
     public Table(Database database, String name) {
         super(database);
@@ -113,6 +111,8 @@ public class Table extends AbstractRelation {
     public void removePKey() {
         if (!hasPKey())
             throw new InvalidDBAccessException("Unable to remove primary key: primary key not found");
+        if (!pKeyConstraint.canRemove())
+            throw new InvalidDBAccessException("Unable to remove primary key");
         pKeyConstraint.remove();
     }
 
@@ -213,6 +213,8 @@ public class Table extends AbstractRelation {
     }
 
     public boolean existsByCols(Row expected, Set<Integer> cols) {
+        if (index != null && cols.equals(pKey))
+            return index.findById(getKeyTuple(expected)) >= 0;
         return findAny(expected, cols) != null;
     }
 
@@ -223,7 +225,7 @@ public class Table extends AbstractRelation {
         }
         for (Constraint c : constraints.values())
             if (!c.checkOnInsert(this, row))
-                throw new InvalidDBAccessException("Unable to insert row: row volatiles constraint " + c.toString());
+                throw new InvalidDBAccessException("Unable to insert row: row volatiles constraint " + c);
         rows.add(row);
         if (this.index != null)
             index.save(getKeyTuple(row), rows.size() - 1);
@@ -301,9 +303,8 @@ public class Table extends AbstractRelation {
 
     private Tuple getKeyTuple(RowDefinition definition) {
         Set<Integer> assignedRows = new HashSet<>();
-        definition.getAssigns().forEach((id, val) -> {
-            assignedRows.add(columns.getIncompleteIdIndex(id));
-        });
+        definition.getAssigns().forEach((id, val) ->
+                assignedRows.add(columns.getIncompleteIdIndex(id)));
         if (!assignedRows.containsAll(pKey))
             return null;
 
@@ -318,9 +319,8 @@ public class Table extends AbstractRelation {
 
     private Tuple getKeyTuple(Row row) {
         Tuple key = new Tuple(pKey.size());
-        rowIndexToKeyIndexMap.forEach((rowIndex, keyIndex) -> {
-            key.set(keyIndex, row.get(rowIndex));
-        });
+        rowIndexToKeyIndexMap.forEach((rowIndex, keyIndex) ->
+                key.set(keyIndex, row.get(rowIndex)));
         return key;
     }
 
@@ -340,20 +340,10 @@ public class Table extends AbstractRelation {
                             .collect(Collectors.joining(", ")));
                     builder.append(") ").append(constraint.getName()).append("\n");
                 }
-                case ForeignKeyConstraint c -> {
-                    builder .append(c.getFromTable().name).append("::")
-                            .append(c.getFromTable().columns.getColumn(c.getFromCol()).getName())
-                            .append(" -> ")
-                            .append(c.getToTable().name).append("::")
-                            .append(c.getToTable().columns.getColumn(c.getToCol()).getName())
-                            .append(" ").append(constraint.getName()).append("\n")
-                            .append("\n");
-                }
-                case NotNullConstraint c -> {
-                    builder.append("NotNull(").append(columns.getColumn(c.getRowIndex()).getName()).append(") ").append(constraint.getName()).append("\n");
-                }
+                case NotNullConstraint c ->
+                        builder.append("NotNull(").append(columns.getColumn(c.getRowIndex()).getName()).append(") ").append(constraint.getName()).append("\n");
                 default ->
-                    builder.append(constraint.toString()).append(" ").append(constraint.getName()).append("\n");
+                    builder.append(constraint).append(" ").append(constraint.getName()).append("\n");
             }
         }
         builder.append("Data [").append(rows.size()).append(" rows]:\n");
@@ -412,45 +402,55 @@ public class Table extends AbstractRelation {
                 Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), this);
                 this.addConstraint(new UniqueConstraint(constrDef.getId().value, this, constraintCols));
             }
-            case PREDICATE -> {
-                // TODO
-                throw new UnsupportedOperationException();
-            }
-            case FOREIGN_KEY -> {
-                if (constrDef.getArgs().getArgs().size() != 2)
-                    throw new IllegalArgumentException();
-                Id from = (Id) constrDef.getArgs().getArgs().get(0);
-                Id to = (Id) constrDef.getArgs().getArgs().get(1);
-
-                if (from.scope != null)
-                    throw new InvalidDBAccessException("Illegal id");
-                if (to.scope == null)
-                    throw new InvalidDBAccessException("Target table not specified");
-                Table targetTable = database.getTable(to.scope);
-                if (targetTable == null)
-                    throw new InvalidDBAccessException("Unknown table " + to.scope);
-
-                int fromColumnId = this.getColumns().getIndex(from.value);
-                if (fromColumnId < 0)
-                    throw new InvalidDBAccessException("Unknown column " + from.value);
-                int toColumnId = targetTable.getColumns().getIndex(to.value);
-                if (toColumnId < 0)
-                    throw new InvalidDBAccessException("Unknown column " + to);
-
-                Constraint constraint = new ForeignKeyConstraint(constrDef.getId().value, this, fromColumnId, targetTable, toColumnId);
-                this.addConstraint(constraint);
-                targetTable.addConstraint(constraint);
-            }
+            case PREDICATE -> // TODO
+                    throw new UnsupportedOperationException();
+            case FOREIGN_KEY -> addForeignKey(constrDef);
             case PRIMARY_KEY -> {
                 if (this.getPKey() != null)
                     throw new InvalidDBAccessException("Multiple primary keys");
 
                 Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), this);
                 setPKey(constraintCols);
-//                this.addConstraint(new PrimaryKeyConstraint(constrDef.getId().value, this, constraintCols));
             }
         }
+    }
 
+    private void addForeignKey(ConstraintDefinition definition) {
+        String name = definition.getId().getNonScoped();
+        Table target = null;
+        Set<Integer> cols = new HashSet<>();
+        Map<Integer, Integer> mapping = new HashMap<>();
+
+        if (definition.getArgs().getArgs().size() != 1)
+            throw new InvalidDBAccessException("Illegal foreign key");
+
+        Definitions defs = (Definitions) definition.getArgs().getArgs().getFirst();
+        for (var arg : defs.getDefinitions()) {
+            ForeignColReference ref = (ForeignColReference) arg;
+            Table toTable = ref.getTo().scope == null ? this : database.getTable(ref.getTo().scope);
+            if (target != null && target != toTable)
+                throw new InvalidDBAccessException("All foreign key targets should be from same table");
+            target = toTable;
+            if (ref.getFrom().scope != null && !ref.getFrom().scope.equals(name))
+                throw new InvalidDBAccessException("Illegal foreign key");
+
+            int fromId = getColumns().getIndex(ref.getFrom().value);
+            int toId = target.getColumns().getIndex(ref.getTo().value);
+
+            if (fromId < 0 || toId < 0)
+                throw new InvalidDBAccessException("Unknown column");
+
+            if (mapping.containsKey(fromId))
+                throw new InvalidDBAccessException("Illegal foreign key");
+
+            mapping.put(fromId, toId);
+            cols.add(toId);
+        }
+
+        if (!cols.equals(target.pKey))
+            throw new InvalidDBAccessException("Foreign key should refer to the primary key");
+
+        addConstraint(new ForeignConstraint(name, this, target, mapping));
     }
 
     private Set<Integer> getColumnsIdsFromArg(FunArgs args, Table table) {

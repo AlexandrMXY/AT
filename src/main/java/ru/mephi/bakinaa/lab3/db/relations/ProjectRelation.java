@@ -23,7 +23,7 @@ public class ProjectRelation extends AbstractRelation {
         for (var col : cols) {
             if (!base.hasColumn(col))
                 throw new InvalidDBAccessException("Unknown colum " + col);
-            cols.add(col);
+            this.cols.add(col);
             if (inaccurateCols.contains(col.value))
                 inaccurateCols.remove(col.value);
             else

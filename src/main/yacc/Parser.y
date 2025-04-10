@@ -22,11 +22,11 @@
 %right ASSIGN
 %left OR
 %left AND
+%nonassoc EQUALS NOT_EQUALS GREATER LESS GREATER_EQ LESS_EQ
 %left NOT
 %left ADD SUB
 %left MUL DIV
 %left NEG
-%nonassoc EQUALS NOT_EQUALS GREATER LESS GREATER_EQ LESS_EQ
 %left SEMICOLON
 %left DOT
 %nonassoc SCOPE_OPERATOR
@@ -41,6 +41,7 @@ definitionsGroup: CUR_BR_OPEN definition CUR_BR_CLOSE { $$ = $2; }
 definition: id ASSIGN expr SEMICOLON { $$ = new YYParserVal(new Definitions(new Assign((Id)$1.obj, (Expression)$3.obj))); }
     | constraintDef SEMICOLON        { $$ = new YYParserVal(new Definitions((Definition) $1.obj)); }
     | colDef SEMICOLON               { $$ = new YYParserVal(new Definitions((Definition) $1.obj)); }
+    | id ARROW id SEMICOLON          { $$ = new YYParserVal(new Definitions(new ForeignColReference((Id)$1.obj, (Id)$3.obj))); }
     | definition definition          { $$ = new YYParserVal(((Definitions)$1.obj).add((Definitions)$2.obj)); }
 
 expr: TRUE      { $$ = new YYParserVal(Bool.TRUE); }
@@ -91,7 +92,6 @@ colDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, (Id)$2.o
     | MODIFIER colDef { ((ColDefinition)$2.obj).addModifier(Modifier.parse($1.sval)); $$ = $2; }
 
 constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE id { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (FunArgs)$3.obj, (Id)$5.obj)); }
-    | id ARROW id id { $$ = new YYParserVal(ConstraintDefinition.foreignKey((Id)$1.obj, (Id)$3.obj, (Id)$4.obj)); }
 
 tableDef: INDEX_TYPE RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition(IndexType.parse($1.sval), (Definitions)$4.obj, (Id)$3.obj)); }
     | RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$3.obj, (Id)$2.obj)); }

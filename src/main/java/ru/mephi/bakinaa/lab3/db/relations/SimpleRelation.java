@@ -105,7 +105,7 @@ public class SimpleRelation extends AbstractRelation {
     @Override
     public void moveToIndex(RowView view, int index) {
         if (view instanceof SimpleRowView rowView) {
-            rowView.setIndex(this.index.get(index));
+            rowView.setIndex(index);
         } else throw new IllegalArgumentException();
     }
 

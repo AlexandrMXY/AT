@@ -27,7 +27,7 @@ public class ExpressionContext {
     }
 
     public static ExpressionContext create(Relation relation) {
-        return new ExpressionContext(null, relation.getDatabase(), relation, null, null);
+        return new ExpressionContext(null, relation.getDatabase(), relation, null, new HashMap<>());
     }
     public static ExpressionContext create(Database db) {
         return create(db, null);

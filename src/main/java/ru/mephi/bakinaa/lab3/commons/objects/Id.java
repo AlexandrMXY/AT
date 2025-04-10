@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.Obj;
+import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
@@ -23,5 +24,12 @@ public class Id implements Obj {
     @Override
     public Obj call(ExpressionContext ctx) {
         return ctx.get(this);
+    }
+
+
+    public String getNonScoped() {
+        if (scope != null)
+            throw new InvalidDBAccessException("Non scoped id expected");
+        return value;
     }
 }

@@ -34,6 +34,8 @@ public class GroupRelation extends AbstractRelation {
         groupsMap.forEach((group, rowsIds) -> {
             Relation groupRelation = new GroupRelation.Group(base, rowsIds);
             ExpressionContext context = ExpressionContext.create(groupRelation);
+            for (var col : cols)
+                context.setValue(col, groupRelation.get(0, col));
 
             aggregators.getAssigns().forEach((column, aggregator) -> {
                 group.set(
