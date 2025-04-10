@@ -6,6 +6,10 @@ import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import java.io.Serializable;
 
 public abstract class SimpleObj implements Obj, Serializable {
+    public String getCsvString() {
+        return toString();
+    }
+
     public static int compare(SimpleObj left, SimpleObj right) {
         if (left == null)
             return right == null ? 0 : -1;

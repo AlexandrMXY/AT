@@ -92,9 +92,9 @@ public abstract class BaseTest {
     }
 
     protected Obj perform(String query, String db) {
-        return controller.process(query, db);
+        return controller.process(query, db).getBody();
     }
     protected Obj perform(String query) {
-        return controller.process(query);
+        return controller.process(query).getBody();
     }
 }

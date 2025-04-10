@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
 @AllArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class Int extends Num {
     public final long value;
 

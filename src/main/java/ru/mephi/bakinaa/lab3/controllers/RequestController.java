@@ -1,22 +1,35 @@
 package ru.mephi.bakinaa.lab3.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mephi.bakinaa.lab3.commons.Obj;
+import ru.mephi.bakinaa.lab3.convertes.RelationResponseCsvHttpMessageConverter;
 import ru.mephi.bakinaa.lab3.service.QueryProcessorService;
 
 @RestController
 public class RequestController {
+    private static final MediaType CSV = RelationResponseCsvHttpMessageConverter.CSV;
+
     @Autowired
     private QueryProcessorService queryProcessorService;
 
     @PostMapping("/")
-    public Obj process(@RequestBody String body) {
-        return queryProcessorService.executeGlobalQuery(body);
+    @ResponseBody
+    public ResponseEntity<Obj> process(@RequestBody String body) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(CSV)
+                .body(queryProcessorService.executeGlobalQuery(body));
     }
 
     @PostMapping("/{database}")
-    public Obj process(@RequestBody String body, @PathVariable("database") String db) {
-        return queryProcessorService.executeDatabaseQuery(body, db);
+    public ResponseEntity<Obj> process(@RequestBody String body, @PathVariable("database") String db) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(CSV)
+                .body(queryProcessorService.executeDatabaseQuery(body, db));
     }
 }

@@ -1,10 +1,8 @@
 package ru.mephi.bakinaa.lab3.service.io;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import ru.mephi.bakinaa.lab3.AppConfig;
+import ru.mephi.bakinaa.lab3.config.AppConfig;
 import ru.mephi.bakinaa.lab3.db.Database;
 import ru.mephi.bakinaa.lab3.exceptions.DBException;
 import ru.mephi.bakinaa.lab3.service.DatabaseService;

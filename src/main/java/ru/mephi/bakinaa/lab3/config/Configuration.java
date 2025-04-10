@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3;
+package ru.mephi.bakinaa.lab3.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

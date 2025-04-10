@@ -5,8 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @AllArgsConstructor
-@EqualsAndHashCode
-@ToString
+@EqualsAndHashCode(callSuper = false)
 public class Str extends SimpleObj {
     public final String value;
 
@@ -18,5 +17,10 @@ public class Str extends SimpleObj {
     @Override
     public String toString() {
         return value;
+    }
+
+    @Override
+    public String getCsvString() {
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }
