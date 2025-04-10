@@ -29,7 +29,7 @@ public class ForeignConstraint extends Constraint {
         this.mapping = mapping;
         this.targetKeyConstraint = to.getPKeyConstraint();
         targetColsSet = new HashSet<>(mapping.values());
-        sourcesColsSet = mapping.keySet();
+        sourcesColsSet = new HashSet<>(mapping.keySet());
 
         if (!targetColsSet.equals(to.getPKey()))
             throw new InvalidDBAccessException("Invalid mapping");

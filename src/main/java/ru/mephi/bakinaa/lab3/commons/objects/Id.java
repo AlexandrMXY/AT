@@ -6,9 +6,11 @@ import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
+import java.io.Serializable;
+
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Id implements Obj {
+public class Id implements Obj, Serializable {
     public String scope = null;
     public String value;
 

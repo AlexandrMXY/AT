@@ -3,7 +3,9 @@ package ru.mephi.bakinaa.lab3.commons.objects;
 import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
-public abstract class SimpleObj implements Obj {
+import java.io.Serializable;
+
+public abstract class SimpleObj implements Obj, Serializable {
     public static int compare(SimpleObj left, SimpleObj right) {
         if (left == null)
             return right == null ? 0 : -1;

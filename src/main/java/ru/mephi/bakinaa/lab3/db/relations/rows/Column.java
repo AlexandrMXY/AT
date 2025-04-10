@@ -9,11 +9,12 @@ import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.enums.Type;
 
+import java.io.Serializable;
 import java.util.Set;
 
 
 @AllArgsConstructor
-public class Column {
+public class Column implements Serializable {
     private final Table table;
     @Getter @Setter
     private String name;

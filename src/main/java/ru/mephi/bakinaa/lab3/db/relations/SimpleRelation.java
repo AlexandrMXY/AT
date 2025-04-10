@@ -33,7 +33,7 @@ public class SimpleRelation extends AbstractRelation {
         int skipped = 0;
         RowView rowView = relation.first();
         ExpressionContext context = ExpressionContext.create(database, rowView);
-        for (int i = 0; i < relation.getSize() && index.size() <= limit; i++) {
+        for (int i = 0; i < relation.getSize() && index.size() < limit; i++) {
             relation.moveToIndex(rowView, i);
             if (!checkFilters(context, filters))
                 continue;

@@ -3,12 +3,13 @@ package ru.mephi.bakinaa.lab3.db.relations.rows;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class Row {
+public class Row implements Serializable {
     private final List<SimpleObj> data = new ArrayList<>();
 
     public SimpleObj get(int index) {

@@ -8,11 +8,12 @@ import ru.mephi.bakinaa.lab3.commons.objects.Real;
 import ru.mephi.bakinaa.lab3.commons.objects.Str;
 import ru.mephi.bakinaa.lab3.exceptions.LangException;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Predicate;
 
 @RequiredArgsConstructor
-public enum Type {
+public enum Type implements Serializable {
     STRING(o -> o == null ||  o instanceof Str),
     REAL(o -> o == null || o instanceof Real),
     INT(o -> o == null || o instanceof Int),

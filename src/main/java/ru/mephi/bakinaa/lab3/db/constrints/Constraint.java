@@ -6,11 +6,12 @@ import ru.mephi.bakinaa.lab3.db.relations.rows.Row;
 import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
-public abstract class Constraint {
+public abstract class Constraint implements Serializable {
     private final String name;
 
     public boolean canAddToTable(Table table) { return table.isEmpty().value; }

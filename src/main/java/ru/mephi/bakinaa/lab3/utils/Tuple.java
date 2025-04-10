@@ -3,8 +3,10 @@ package ru.mephi.bakinaa.lab3.utils;
 import lombok.EqualsAndHashCode;
 import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 
+import java.io.Serializable;
+
 @EqualsAndHashCode
-public class Tuple {
+public class Tuple implements Serializable {
     private final SimpleObj[] data;
     public Tuple(int size) {
         data = new SimpleObj[size];

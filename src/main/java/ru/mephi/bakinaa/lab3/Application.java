@@ -4,6 +4,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.db.registry.DefaultRegistry;
 import ru.mephi.bakinaa.lab3.db.Database;
@@ -11,6 +13,7 @@ import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.lang.QueryParser;
 
 @SpringBootApplication
+@EnableConfigurationProperties({AppConfig.class})
 @Slf4j
 public class Application {
     public static void main(String[] args) {

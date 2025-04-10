@@ -1,7 +1,9 @@
 package ru.mephi.bakinaa.lab3.db.relations;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.Expression;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
@@ -21,6 +23,7 @@ import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 import ru.mephi.bakinaa.lab3.utils.Tuple;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +45,13 @@ public class Table extends AbstractRelation {
     private Index index;
     @JsonIgnore
     private PrimaryKeyConstraint pKeyConstraint = null;
+
+
+    public Table(Database database, String name, String cols) {
+        super(database);
+        this.name = name;
+        columns = new Columns(name);
+    }
 
     public Table(Database database, String name) {
         super(database);

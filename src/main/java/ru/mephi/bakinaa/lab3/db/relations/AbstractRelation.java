@@ -16,15 +16,19 @@ import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-@RequiredArgsConstructor
 @Getter
-public abstract class AbstractRelation implements Relation {
+public abstract class AbstractRelation implements Relation, Serializable {
     @JsonIgnore
     protected final Database database;
+
+    protected AbstractRelation(Database database) {
+        this.database = database;
+    }
 
     @Override
     public Relation sort(Sort sort) {

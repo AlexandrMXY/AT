@@ -4,13 +4,14 @@ import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 @RequiredArgsConstructor
-public class Columns implements RowMapping {
+public class Columns implements RowMapping, Serializable {
     private final String tableName;
     private final Map<String, Column> columns = new HashMap<>();
     private final Map<Integer, Column> columnIndexesMap = new HashMap<>();

@@ -15,11 +15,12 @@ import ru.mephi.bakinaa.lab3.lang.enums.Modifier;
 import ru.mephi.bakinaa.lab3.lang.defs.TableDefinition;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 
+import java.io.Serializable;
 import java.util.*;
 
 @RequiredArgsConstructor
 @Getter
-public class Database {
+public class Database implements Serializable {
     private final String name;
     private final Map<String, Table> tables = new HashMap<>();
 
