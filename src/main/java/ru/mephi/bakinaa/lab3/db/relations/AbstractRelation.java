@@ -1,5 +1,6 @@
 package ru.mephi.bakinaa.lab3.db.relations;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.Expression;
@@ -15,12 +16,14 @@ import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
 @Getter
 public abstract class AbstractRelation implements Relation {
+    @JsonIgnore
     protected final Database database;
 
     @Override
@@ -135,5 +138,24 @@ public abstract class AbstractRelation implements Relation {
         }
 
         return builder.toString();
+    }
+
+    @Override
+    public Iterator<RowView> iterator() {
+        return new Iter();
+    }
+
+    private class Iter implements Iterator<RowView> {
+        private int i = 0;
+
+        @Override
+        public boolean hasNext() {
+            return i < getSize();
+        }
+
+        @Override
+        public RowView next() {
+            return getByIndex(i++);
+        }
     }
 }

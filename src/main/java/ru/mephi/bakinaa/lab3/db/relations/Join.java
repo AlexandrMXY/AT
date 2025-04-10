@@ -82,8 +82,11 @@ public class Join extends AbstractRelation {
 
     @Override
     public RowView getByIndex(int index) {
-        return null;
-    }
+        if (size == 0)
+            return null;
+        return new JoinRowView(this,
+                leftIndex.get(index) == -1 ? null : left.getByIndex(leftIndex.get(index)),
+                rightIndex.get(index) == -1 ? null : right.getByIndex(rightIndex.get(index)));    }
 
     @Override
     public RowView first() {
@@ -112,8 +115,8 @@ public class Join extends AbstractRelation {
     @Override
     public SimpleObj get(int rowId, Id columnId) {
         return mapping.getIncompleteIdIndex(columnId) == LEFT_MAPPING_ID ?
-                left.get(leftIndex.get(rowId), columnId) :
-                right.get(rightIndex.get(rowId), columnId);
+                leftIndex.get(rowId) < 0 ? null : left.get(leftIndex.get(rowId), columnId) :
+                rightIndex.get(rowId) < 0 ? null : right.get(rightIndex.get(rowId), columnId);
     }
 
     @Override

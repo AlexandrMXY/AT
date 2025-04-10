@@ -45,29 +45,24 @@ public class Database {
     }
 
     public void createTable(TableDefinition definition) {
+        if (definition.getId().scope != null)
+            throw new InvalidDBAccessException("Illegal table id");
+        if (tables.containsKey(definition.getId().value))
+            throw new InvalidDBAccessException("Table already exists");
+
         Table table = new Table(this, definition.getId().value);
 
         table.addColumns(definition.getCols());
 
         createUserConstraints(table, definition);
-        createModifierConstraint(table);
 
-        if (table.getPKey() == null && definition.getIndexType() != IndexType.NONE)
+        if (!table.hasPKey() && definition.getIndexType() != IndexType.NONE)
             throw new InvalidDBAccessException("Primary key not specified. Unable to create indexed table");
         switch (definition.getIndexType()) {
             case HASHTABLE -> table.setIndex(MapIndex.createHash());
             case TREE, ORDERED -> table.setIndex(MapIndex.createTree());
         }
         tables.put(table.getName(), table);
-    }
-
-    private void createModifierConstraint(Table table) {
-        for (var col : table.getColumns().getColumnsMap().values()) {
-            if (col.isUnique())
-                table.addConstraint(new UniqueConstraint(col.getName() + "#unique", table , Set.of(col.getIndex())));
-            if (!col.isNullable())
-                table.addConstraint(new NotNullConstraint(col.getName() + "#notnull", table, col.getIndex()));
-        }
     }
 
     private void createUserConstraints(Table table, TableDefinition definition) {

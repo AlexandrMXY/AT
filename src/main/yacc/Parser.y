@@ -93,7 +93,7 @@ colDef: TYPE_NAME id  { $$ = new YYParserVal(new ColDefinition($1.sval, (Id)$2.o
 constraintDef: CONSTRAINT PAR_OPEN args PAR_CLOSE id { $$ = new YYParserVal(ConstraintDefinition.parse($1.sval, (FunArgs)$3.obj, (Id)$5.obj)); }
     | id ARROW id id { $$ = new YYParserVal(ConstraintDefinition.foreignKey((Id)$1.obj, (Id)$3.obj, (Id)$4.obj)); }
 
-tableDef: INDEX_TYPE RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$4.obj, (Id)$3.obj)); }
+tableDef: INDEX_TYPE RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition(IndexType.parse($1.sval), (Definitions)$4.obj, (Id)$3.obj)); }
     | RELATIONSHIP id definitionsGroup { $$ = new YYParserVal(new TableDefinition((Definitions)$3.obj, (Id)$2.obj)); }
 
 %%

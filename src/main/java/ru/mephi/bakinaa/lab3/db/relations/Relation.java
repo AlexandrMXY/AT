@@ -14,7 +14,7 @@ import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 
 import java.util.Set;
 
-public interface Relation extends Obj {
+public interface Relation extends Obj, Iterable<RowView> {
     Id REDUCE_ACCUMULATOR_VARIABLE = new Id("__value");
 
     Database getDatabase();

@@ -13,6 +13,7 @@ import java.util.Map;
 public abstract class Constraint {
     private final String name;
 
+    public boolean canAddToTable(Table table) { return table.isEmpty().value; }
     public boolean checkOnInsert(Table table, Row row) { return true; }
     public boolean checkOnRemove(Table table, Row row) { return true; }
     public boolean checkOnModify(Table table, Row row, Map<Integer, SimpleObj> updates) { return true; }

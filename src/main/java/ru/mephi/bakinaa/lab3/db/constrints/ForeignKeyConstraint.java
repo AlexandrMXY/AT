@@ -64,4 +64,9 @@ public class ForeignKeyConstraint extends Constraint {
         fromTable.forceRemoveConstraint(getName());
         toTable.forceRemoveConstraint(getName());
     }
+
+    @Override
+    public boolean canAddToTable(Table table) {
+        return table == toTable || super.canAddToTable(table);
+    }
 }

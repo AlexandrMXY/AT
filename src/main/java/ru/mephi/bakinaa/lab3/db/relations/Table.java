@@ -1,5 +1,6 @@
 package ru.mephi.bakinaa.lab3.db.relations;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import ru.mephi.bakinaa.lab3.commons.Expression;
 import ru.mephi.bakinaa.lab3.commons.ExpressionContext;
@@ -25,10 +26,13 @@ import ru.mephi.bakinaa.lab3.utils.Tuple;
 import java.util.*;
 import java.util.stream.Collectors;
 
+// TODO обновление индекса при модификации ключа
 @Getter
 public class Table extends AbstractRelation {
     private final String name;
+    @JsonIgnore
     private final Columns columns;
+    @JsonIgnore
     private final Map<String, Constraint> constraints = new HashMap<>();
 
     private final List<Row> rows = new ArrayList<>();
@@ -36,7 +40,9 @@ public class Table extends AbstractRelation {
     private Set<Integer> pKey;
     private Map<String, Integer>  keyRowToKeyTupleIndex = new HashMap<>();
     private Map<Integer, Integer> rowIndexToKeyIndexMap = new HashMap<>();
+    @JsonIgnore
     private Index index;
+    @JsonIgnore
     private Constraint pKeyConstraint = null;
 
     public Table(Database database, String name) {
@@ -136,10 +142,10 @@ public class Table extends AbstractRelation {
     }
 
     public void addConstraint(Constraint constraint) {
-        if (!rows.isEmpty())
-            throw new InvalidDBAccessException("Unable to add constraint to not empty table");
+        if (!constraint.canAddToTable(this))
+            throw new InvalidDBAccessException("Unable to add constraint");
         if (constraints.containsKey(constraint.getName()))
-            throw new InvalidDBAccessException("Constraint with given name already exists");
+            throw new InvalidDBAccessException("Constraint with name " + constraint.getName() + " already exists");
         constraints.put(constraint.getName(), constraint);
     }
 
@@ -440,7 +446,8 @@ public class Table extends AbstractRelation {
                     throw new InvalidDBAccessException("Multiple primary keys");
 
                 Set<Integer> constraintCols = getColumnsIdsFromArg(constrDef.getArgs(), this);
-                this.addConstraint(new PrimaryKeyConstraint(constrDef.getId().value, this, constraintCols));
+                setPKey(constraintCols);
+//                this.addConstraint(new PrimaryKeyConstraint(constrDef.getId().value, this, constraintCols));
             }
         }
 

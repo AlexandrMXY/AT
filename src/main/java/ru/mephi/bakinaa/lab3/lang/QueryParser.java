@@ -17,22 +17,16 @@ public class QueryParser {
 
     public QueryParser(String query, Registry registry) {
         lexer = new Lexer(new StringReader(query));
-        parser = new YYParser(true);
+        parser = new YYParser(false);
         parser.parser = this;
         parser.util = new ParserUtils(registry);
     }
 
     public Expressions parse() {
-        try {
-            parser.yyparse();
-            var res = (Expressions) parser.yyval.obj;
-            System.out.println(res);
-            return res;
-        } catch (LangException e) {
-            if (parser.yyval.obj instanceof Expressions exprs)
-                GVUtils.save(exprs, "e.png");
-            throw e;
-        }
+        parser.yyparse();
+        var res = (Expressions) parser.yyval.obj;
+        //System.out.println(res);
+        return res;
     }
 
     @SneakyThrows
@@ -43,7 +37,7 @@ public class QueryParser {
             Token t = lexer.yylex();
             if (t == null)
                 return 0;
-            System.out.println(t);
+            //System.out.println(t);
             parser.yylval = new YYParserVal(t.data());
             return t.type().id;
         } catch (Throwable t) {

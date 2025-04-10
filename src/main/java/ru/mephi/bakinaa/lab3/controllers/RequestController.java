@@ -2,6 +2,7 @@ package ru.mephi.bakinaa.lab3.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.service.QueryProcessorService;
 
 @RestController
@@ -10,12 +11,12 @@ public class RequestController {
     private QueryProcessorService queryProcessorService;
 
     @PostMapping("/")
-    public void process(@RequestBody String body) {
-        queryProcessorService.executeGlobalQuery(body);
+    public Obj process(@RequestBody String body) {
+        return queryProcessorService.executeGlobalQuery(body);
     }
 
     @PostMapping("/{database}")
-    public void process(@RequestBody String body, @PathVariable("database") String db) {
-        queryProcessorService.executeDatabaseQuery(body, db);
+    public Obj process(@RequestBody String body, @PathVariable("database") String db) {
+        return queryProcessorService.executeDatabaseQuery(body, db);
     }
 }

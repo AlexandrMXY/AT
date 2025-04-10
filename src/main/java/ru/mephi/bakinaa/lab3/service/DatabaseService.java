@@ -26,4 +26,8 @@ public class DatabaseService {
             throw new InvalidDBAccessException("Database already exists");
         databases.remove(name);
     }
+
+    public void removeAll() {
+        databases.clear();
+    }
 }

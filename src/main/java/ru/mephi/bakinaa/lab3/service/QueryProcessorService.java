@@ -25,7 +25,7 @@ public class QueryProcessorService {
         Database database = databaseService.getDatabase(databaseName);
         if (database == null)
             throw new InvalidDBAccessException("Unknown database " + databaseName);
-        ExpressionContext context = ExpressionContext.create();
+        ExpressionContext context = ExpressionContext.create(database);
         Expressions expressions = parserService.parse(query);
         return expressions.call(context);
     }
