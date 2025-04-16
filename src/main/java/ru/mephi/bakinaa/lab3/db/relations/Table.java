@@ -247,7 +247,7 @@ public class Table extends AbstractRelation {
         rowDefinition.getAssigns().forEach((id, expr) -> {
             if (id.scope != null && !id.scope.equals(name))
                 throw new InvalidDBAccessException("Invalid scope");
-            row.set(columns.getColumn(id.value).getIndex(), (SimpleObj) expr.call(ctx));
+            row.set(columns.getColumn(id.value).getIndex(), expr == null ? null : (SimpleObj) expr.call(ctx));
         });
         insert(row);
     }

@@ -78,10 +78,9 @@ public class FilesDatabaseLoader implements DatabasesLoader {
         }
 
         for (Database database : databaseService.getDatabases()) {
-            saveDatabase(
-                    Paths.get(databaseLocation.toAbsolutePath().toString(), database.getName() + ".db").toFile(),
-                    database);
+            File file = Paths.get(databaseLocation.toAbsolutePath().toString(), database.getName() + ".db").toFile();
+            saveDatabase(file, database);
+            log.info("Databases {} saved to {}", database.getName(), file.getName());
         }
-        log.info("Databases saved to {}", databaseLocation);
     }
 }

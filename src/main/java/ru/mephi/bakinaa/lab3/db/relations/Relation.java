@@ -57,4 +57,6 @@ public interface Relation extends Obj, Iterable<RowView> {
     SimpleObj get(int rowId, Id columnId);
     Set<Id> getColumnsSet();
     boolean hasColumn(Id col);
+
+    SimpleObj get();
 }

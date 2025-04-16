@@ -10,9 +10,11 @@ import ru.mephi.bakinaa.lab3.commons.Sort;
 import ru.mephi.bakinaa.lab3.commons.objects.Bool;
 import ru.mephi.bakinaa.lab3.commons.objects.Id;
 import ru.mephi.bakinaa.lab3.commons.objects.Int;
+import ru.mephi.bakinaa.lab3.commons.objects.SimpleObj;
 import ru.mephi.bakinaa.lab3.db.JoinType;
 import ru.mephi.bakinaa.lab3.db.Database;
 import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
+import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import ru.mephi.bakinaa.lab3.lang.defs.RowDefinition;
 import ru.mephi.bakinaa.lab3.utils.FunctionUtils;
 
@@ -93,7 +95,7 @@ public abstract class AbstractRelation implements Relation, Serializable {
 
     @Override
     public Relation skip(int value) {
-        return new SimpleRelation(this, value, 0, List.of());
+        return new SimpleRelation(this, value, getSize(), List.of());
     }
 
     @Override
@@ -161,5 +163,13 @@ public abstract class AbstractRelation implements Relation, Serializable {
         public RowView next() {
             return getByIndex(i++);
         }
+    }
+
+    @Override
+    public SimpleObj get() {
+        if (getSize() == 1 && getColumnsSet().size() == 1)
+            return get(0, getColumnsSet().iterator().next());
+
+        throw new InvalidDBAccessException("More than one value found");
     }
 }

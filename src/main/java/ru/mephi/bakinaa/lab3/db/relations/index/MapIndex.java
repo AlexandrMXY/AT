@@ -2,6 +2,7 @@ package ru.mephi.bakinaa.lab3.db.relations.index;
 
 import ru.mephi.bakinaa.lab3.db.relations.rows.Row;
 import ru.mephi.bakinaa.lab3.utils.Tuple;
+import ru.mephi.bakinaa.lab3.utils.TupleComparator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,7 @@ public class MapIndex implements Index {
     }
 
     public static MapIndex createTree() {
-        return new MapIndex(new TreeMap<>(Tuple::compare));
+        return new MapIndex(new TreeMap<>(new TupleComparator()));
     }
 
     @Override

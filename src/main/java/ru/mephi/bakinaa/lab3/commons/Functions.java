@@ -19,74 +19,66 @@ public class Functions {
             !Objects.equals(call(args[0], ctx), call(args[1], ctx))
     ));
     public static final Fun<Bool> GREATER_EQ = ((ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
-        if (left == null || right == null)
-            return Bool.of(right == left);
-        if (left instanceof Int left0)
-            return Bool.of(left0.value >= ((Int)right).value);
-        return Bool.of(((Real)left).value >= ((Real)right).value);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
+        return Bool.of(SimpleObj.compare(left, right) >= 0);
     });
     public static final Fun<Bool> LESS_EQ = ((ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
-        if (left == null || right == null)
-            return Bool.of(right == left);
-        if (left instanceof Int left0)
-            return Bool.of(left0.value <= ((Int)right).value);
-        return Bool.of(((Real)left).value <= ((Real)right).value);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
+        return Bool.of(SimpleObj.compare(left, right) <= 0);
     });
     public static final Fun<Bool> GREATER = ((ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
-        if (left == null || right == null)
-            return Bool.of(left != null);
-        if (left instanceof Int left0)
-            return Bool.of(left0.value > ((Int)right).value);
-        return Bool.of(((Real)left).value > ((Real)right).value);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
+        return Bool.of(SimpleObj.compare(left, right) > 0);
     });
     public static final Fun<Bool> LESS = ((ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
-        if (left == null || right == null)
-            return Bool.of(right != null);
-        if (left instanceof Int left0)
-            return Bool.of(left0.value < ((Int)right).value);
-        return Bool.of(((Real)left).value < ((Real)right).value);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
+        return Bool.of(SimpleObj.compare(left, right) < 0);
     });
 
     public static final Fun<SimpleObj> ADD = (ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
         if (left == null)
-            left = right instanceof Real ? new Real(0) : new Int(0);
+            return right;
+        if (right == null)
+            return left;
         if (left instanceof Real r)
             return new Real(r.value + realVal(right));
         return new Int(((Int)left).value + intVal(right));
     };
     public static final Fun<SimpleObj> SUB = (ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
         if (left == null)
-            left = right instanceof Real ? new Real(0) : new Int(0);
+            return right;
+        if (right == null)
+            return left;
         if (left instanceof Real r)
-            return new Real(r.value + realVal(right));
-        return new Int(((Int)left).value + intVal(right));
+            return new Real(r.value - realVal(right));
+        return new Int(((Int)left).value - intVal(right));
     };
     public static final Fun<SimpleObj> MUL = (ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
         if (left == null)
-            left = right instanceof Real ? new Real(0) : new Int(0);
+            return right;
+        if (right == null)
+            return left;
         if (left instanceof Real r)
             return new Real(r.value * realVal(right));
         return new Int(((Int)left).value * intVal(right));
     };
     public static final Fun<SimpleObj> DIV = (ctx, args) -> {
-        Obj left = call(args[0], ctx);
-        Obj right = call(args[1], ctx);
+        SimpleObj left  = (SimpleObj) call(args[0], ctx);
+        SimpleObj right = (SimpleObj) call(args[1], ctx);
         if (left == null)
-            left = right instanceof Real ? new Real(0) : new Int(0);
+            return right;
+        if (right == null)
+            return left;
         if (left instanceof Real r)
             return new Real(r.value / realVal(right));
         return new Int(((Int)left).value / intVal(right));
@@ -107,20 +99,11 @@ public class Functions {
             return right;
         if (right == null)
             return left;
-        if (left instanceof Real l0) {
-            if (right instanceof Real r0)
-                return l0.value < r0.value ? r0 : l0;
-            if (right instanceof Int r0)
-                return l0.value < r0.value ? r0 : l0;
-        }
-        if (left instanceof Int l0) {
-            if (right instanceof Real r0)
-                return l0.value < r0.value ? r0 : l0;
-            if (right instanceof Int r0)
-                return l0.value < r0.value ? r0 : l0;
-        }
-        return null;
+
+        int cmp = SimpleObj.compare((SimpleObj) left, (SimpleObj) right);
+        return (Obj) (cmp >= 0 ? left : right);
     };
+
     public static final Fun<?> MIN = (ctx, args) -> {
         Obj left = call(args[0], ctx);
         Obj right = call(args[1], ctx);
@@ -128,19 +111,9 @@ public class Functions {
             return right;
         if (right == null)
             return left;
-        if (left instanceof Real l0) {
-            if (right instanceof Real r0)
-                return l0.value > r0.value ? r0 : l0;
-            if (right instanceof Int r0)
-                return l0.value > r0.value ? r0 : l0;
-        }
-        if (left instanceof Int l0) {
-            if (right instanceof Real r0)
-                return l0.value > r0.value ? r0 : l0;
-            if (right instanceof Int r0)
-                return l0.value > r0.value ? r0 : l0;
-        }
-        return null;
+
+        int cmp = SimpleObj.compare((SimpleObj) left, (SimpleObj) right);
+        return (Obj) (cmp <= 0 ? left : right);
     };
 
 
@@ -173,17 +146,6 @@ public class Functions {
             public Obj call(ExpressionContext ctx, Expression... args) {
                 ctx.getDatabase().createTable(definition);
                 return null;
-            }
-        };
-    }
-
-    public static Fun<?> reference(Id id) {
-        return new Fun<Obj>() {
-            private final Id target = id;
-
-            @Override
-            public Obj call(ExpressionContext ctx, Expression... args) {
-                return ctx.get(target);
             }
         };
     }

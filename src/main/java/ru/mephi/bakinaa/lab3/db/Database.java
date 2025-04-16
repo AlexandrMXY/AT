@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import ru.mephi.bakinaa.lab3.db.constrints.*;
 import ru.mephi.bakinaa.lab3.db.relations.Table;
 import ru.mephi.bakinaa.lab3.db.relations.index.MapIndex;
+import ru.mephi.bakinaa.lab3.db.relations.index.OrderedIndex;
 import ru.mephi.bakinaa.lab3.db.relations.rows.Column;
 import ru.mephi.bakinaa.lab3.db.relations.rows.Columns;
 import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
@@ -61,7 +62,8 @@ public class Database implements Serializable {
             throw new InvalidDBAccessException("Primary key not specified. Unable to create indexed table");
         switch (definition.getIndexType()) {
             case HASHTABLE -> table.setIndex(MapIndex.createHash());
-            case TREE, ORDERED -> table.setIndex(MapIndex.createTree());
+            case TREE -> table.setIndex(MapIndex.createTree());
+            case ORDERED -> table.setIndex(new OrderedIndex());
         }
         tables.put(table.getName(), table);
     }

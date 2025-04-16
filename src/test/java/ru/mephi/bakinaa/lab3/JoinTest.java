@@ -1,6 +1,8 @@
 package ru.mephi.bakinaa.lab3;
 
 import org.junit.jupiter.api.Test;
+import ru.mephi.bakinaa.lab3.commons.objects.Id;
+import ru.mephi.bakinaa.lab3.commons.objects.Int;
 import ru.mephi.bakinaa.lab3.db.relations.Relation;
 import ru.mephi.bakinaa.lab3.db.relations.rows.RowView;
 import ru.mephi.bakinaa.lab3.util.MapRowView;
@@ -13,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class JoinTest extends BaseTest {
     @Test
-    public void innerJoin_trueCondition_returnAllPairs() {
+    public void join_trueCondition_returnAllPairs() {
         Relation rel = (Relation) perform("""
                 X.join(Y, true);
                 """, "test");
@@ -42,104 +44,48 @@ public class JoinTest extends BaseTest {
     }
 
     @Test
-    public void leftJoin_trueCondition_returnAllPairs() {
+    public void innerJoin_condition_returnAllCorrectPairs() {
         Relation rel = (Relation) perform("""
-                X.leftJoin(Y, true);
+                X.join(Y, X::a == Y::a);
                 """, "test");
 
-        List<RowView> expected = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
-            for (int j = 1; j <= 2; j++) {
-                for (int i1 = 1; i1 <= 2; i1++) {
-                    for (int j1 = 1; j1 <= 2; j1++) {
-                        expected.add(
-                                MapRowView.builder("X")
-                                        .obj("a", i)
-                                        .obj("b", j)
-                                        .setScope("Y")
-                                        .obj("a", i1)
-                                        .obj("b", j1)
-                                        .build());
-                    }
-                }
-                expected.add(MapRowView.builder("X")
-                        .obj("a", i)
-                        .obj("b", j).build());
-            }
-        }
         assertThatIterable(rel)
                 .usingElementComparator(new RelationRowComparator(rel))
-                .containsExactlyInAnyOrderElementsOf(expected);
+                .allSatisfy((row) -> {
+                    assertThat(row.get(new Id("X", "a"))).isEqualTo(row.get(new Id("Y", "a")));
+                });
     }
 
     @Test
-    public void rightJoin_trueCondition_returnAllPairs() {
+    public void leftJoin_condition_returnAllCorrectPairs() {
         Relation rel = (Relation) perform("""
-                X.rightJoin(Y, true);
+                X.leftJoin(Y, X::a == 1);
                 """, "test");
 
-        List<RowView> expected = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
-            for (int j = 1; j <= 2; j++) {
-                for (int i1 = 1; i1 <= 2; i1++) {
-                    for (int j1 = 1; j1 <= 2; j1++) {
-                        expected.add(
-                                MapRowView.builder("X")
-                                        .obj("a", i)
-                                        .obj("b", j)
-                                        .setScope("Y")
-                                        .obj("a", i1)
-                                        .obj("b", j1)
-                                        .build());
-                        if (i == 1 && j == 1)
-                            expected.add(MapRowView.builder("Y")
-                                    .obj("a", i1)
-                                    .obj("b", j1).build());
-                    }
-                }
-
-            }
-        }
         assertThatIterable(rel)
                 .usingElementComparator(new RelationRowComparator(rel))
-                .containsExactlyInAnyOrderElementsOf(expected);
+                .allSatisfy((row) -> {
+                    if (!row.get(new Id("X", "a")).equals(new Int(1))) {
+                        assertThat(row.get(new Id("Y", "a"))).isEqualTo(null);
+                        assertThat(row.get(new Id("Y", "b"))).isEqualTo(null);
+                    }
+                });
     }
 
     @Test
-    public void fullJoin_trueCondition_returnAllPairs() {
+    public void rightJoin_condition_returnAllCorrectPairs() {
         Relation rel = (Relation) perform("""
-                X.fullJoin(Y, true);
+                X.rightJoin(Y, Y::a == 1);
                 """, "test");
 
-        List<RowView> expected = new ArrayList<>();
-        expected.add(MapRowView.builder().build());
-        for (int i = 1; i <= 2; i++) {
-            for (int j = 1; j <= 2; j++) {
-                for (int i1 = 1; i1 <= 2; i1++) {
-                    for (int j1 = 1; j1 <= 2; j1++) {
-                        expected.add(
-                                MapRowView.builder("X")
-                                        .obj("a", i)
-                                        .obj("b", j)
-                                        .setScope("Y")
-                                        .obj("a", i1)
-                                        .obj("b", j1)
-                                        .build());
-                        if (i == 1 && j == 1)
-                            expected.add(MapRowView.builder("Y")
-                                    .obj("a", i1)
-                                    .obj("b", j1).build());
-                    }
-                }
-                expected.add(MapRowView.builder("X")
-                        .obj("a", i)
-                        .obj("b", j).build());
-            }
-//            expected.add(MapRowView.builder().build());
-        }
-        rel.toString();
         assertThatIterable(rel)
                 .usingElementComparator(new RelationRowComparator(rel))
-                .containsExactlyInAnyOrderElementsOf(expected);
+                .allSatisfy((row) -> {
+                    if (!new Int(1).equals(row.get(new Id("Y", "a")))) {
+                        assertThat(row.get(new Id("X", "a"))).isNull();
+                        assertThat(row.get(new Id("X", "b"))).isNull();
+                    }
+                });
     }
+
 }

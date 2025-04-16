@@ -1,4 +1,4 @@
-package ru.mephi.bakinaa.lab3.convertes;
+package ru.mephi.bakinaa.lab3.utils.convertes;
 
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -48,6 +48,8 @@ public class RelationResponseCsvHttpMessageConverter implements HttpMessageConve
     public void write(@NonNull Relation relation, MediaType contentType, @NonNull HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
         if (contentType == null || !contentType.equalsTypeAndSubtype(CSV))
             throw new UnsupportedEncodingException(String.valueOf(contentType));
+        if (relation == null)
+            return;
 
         var body = outputMessage.getBody();
         var colSet = relation.getColumnsSet();
@@ -70,7 +72,7 @@ public class RelationResponseCsvHttpMessageConverter implements HttpMessageConve
                     body.write(SEPARATOR);
                 SimpleObj val = row.get(col);
                 if (val != null)
-                    body.write(val.toString().getBytes(CHARSET));
+                    body.write(val.toCsvString().getBytes(CHARSET));
                 coma = true;
             }
             body.write(LINE_SEPARATOR);

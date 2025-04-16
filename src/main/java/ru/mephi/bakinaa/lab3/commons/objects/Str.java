@@ -20,7 +20,7 @@ public class Str extends SimpleObj {
     }
 
     @Override
-    public String getCsvString() {
+    public String toCsvString() {
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\"";
     }
 }

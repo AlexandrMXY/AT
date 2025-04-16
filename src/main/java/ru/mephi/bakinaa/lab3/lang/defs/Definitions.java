@@ -1,12 +1,14 @@
 package ru.mephi.bakinaa.lab3.lang.defs;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import ru.mephi.bakinaa.lab3.commons.Obj;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor
 public class Definitions implements Obj {
     private final List<Definition> definitions = new ArrayList<>();
 

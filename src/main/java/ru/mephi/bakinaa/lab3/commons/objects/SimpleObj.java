@@ -6,7 +6,7 @@ import ru.mephi.bakinaa.lab3.exceptions.InvalidDBAccessException;
 import java.io.Serializable;
 
 public abstract class SimpleObj implements Obj, Serializable {
-    public String getCsvString() {
+    public String toCsvString() {
         return toString();
     }
 

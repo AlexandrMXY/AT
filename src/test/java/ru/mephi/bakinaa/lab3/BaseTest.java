@@ -4,11 +4,13 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import ru.mephi.bakinaa.lab3.commons.Obj;
 import ru.mephi.bakinaa.lab3.controllers.RequestController;
 import ru.mephi.bakinaa.lab3.service.DatabaseService;
 
 @SpringBootTest
+@TestPropertySource(properties = "app.save-to-file=false")
 public abstract class BaseTest {
     @Autowired
     protected RequestController controller;

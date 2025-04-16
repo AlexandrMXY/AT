@@ -1,15 +1,17 @@
 package ru.mephi.bakinaa.lab3.controllers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.mephi.bakinaa.lab3.commons.Obj;
-import ru.mephi.bakinaa.lab3.convertes.RelationResponseCsvHttpMessageConverter;
+import ru.mephi.bakinaa.lab3.utils.convertes.RelationResponseCsvHttpMessageConverter;
 import ru.mephi.bakinaa.lab3.service.QueryProcessorService;
 
 @RestController
+@Slf4j
 public class RequestController {
     private static final MediaType CSV = RelationResponseCsvHttpMessageConverter.CSV;
 
@@ -31,5 +33,13 @@ public class RequestController {
                 .status(HttpStatus.OK)
                 .contentType(CSV)
                 .body(queryProcessorService.executeDatabaseQuery(body, db));
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> exceptionHandler(RuntimeException e) {
+        log.atInfo().setCause(e).log();
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(e.getMessage());
     }
 }
